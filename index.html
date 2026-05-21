@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Amor à 1a Vista</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg?v=8">
+    <link rel="icon" type="image/jpeg" href="logo.jpg?v=8">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root { 
+            --header-bg: #2C1E16; --header-text: #FFFFFF; --bg: #FFFFFF; 
+            --surface: #FFFFFF; --text: #111111; --subtext: #666666; 
+            --accent: #B8860B; --border: #E8E8E8; --box-bg: #FAFAFA;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body { background-color: #EFEFEF; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+
+        #app-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--header-bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            border-radius: 30px;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 30px rgba(184, 134, 11, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        header {
+            padding: 45px 20px 15px;
+            flex-shrink: 0;
+            background-color: var(--header-bg);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-content { flex-grow: 1; }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--header-text);
+            margin-bottom: 4px;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--header-text);
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            padding-right: 10px;
+        }
+
+        .view {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0;
+            display: none;
+            -webkit-overflow-scrolling: touch;
+            background-color: var(--bg);
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .roteiro-wrapper { padding: 0 20px 110px; }
+
+        .day-header {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            padding: 25px 0 15px;
+            text-transform: capitalize;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 5px;
+            top: 10px;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            opacity: 0.3;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -21px;
+            top: 25px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--bg);
+            z-index: 2;
+            transition: all 0.3s;
+        }
+
+        .timeline-dot.current {
+            animation: blinkDot 1.5s infinite;
+            background: #FFD700;
+            box-shadow: 0 0 10px #FFD700;
+        }
+
+        @keyframes blinkDot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--box-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .list-item.past { opacity: 0.5; filter: grayscale(50%); }
+        .list-item.locked { pointer-events: none; }
+        
+        .list-item.locked.blur {
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .list-item.locked.blur .list-img,
+        .list-item.locked.blur .list-content,
+        .list-item.locked.blur .list-arrow {
+            filter: blur(10px) grayscale(50%);
+            opacity: 0.4;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            border-radius: 16px;
+        }
+        
+        .list-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 15px;
+            transition: 0.3s;
+        }
+
+        .list-content { flex-grow: 1; transition: 0.3s; }
+
+        .list-time {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .list-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .list-subtitle {
+            font-size: 13px;
+            color: var(--subtext);
+        }
+
+        .guia-wrapper {
+            padding: 20px 20px 110px;
+            background: #f7f7f7;
+            min-height: 100%;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .card.locked { pointer-events: none; }
+
+        .card.locked .card-img,
+        .card.locked .card-body {
+            filter: blur(15px) grayscale(50%);
+            opacity: 0.4;
+        }
+        
+        .card-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .card-body { padding: 20px; }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .extras-wrapper { padding: 20px 20px 110px; }
+        
+        .vip-card-container {
+            perspective: 1000px;
+            margin-bottom: 30px;
+            height: 230px;
+        }
+
+        .vip-card {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .vip-card.flipped { transform: rotateY(180deg); }
+
+        .vip-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .vip-front {
+            background: linear-gradient(135deg, #E6D070, #946B2D);
+            color: #2C1E16;
+        }
+        
+        .vip-back {
+            background: #2C1E16;
+            color: #D4AF37;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .vip-back-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .vip-back-content::-webkit-scrollbar { width: 3px; }
+        .vip-back-content::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+
+        .chip {
+            width: 45px;
+            height: 35px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin: 25px 0 10px;
+            letter-spacing: 1px;
+        }
+
+        .feature-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .feature-btn:active { transform: scale(0.98); }
+
+        .feature-btn i.icon-main {
+            font-size: 20px;
+            color: var(--accent);
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .nos-wrapper {
+            padding: 40px 20px 110px;
+            text-align: center;
+        }
+
+        .nos-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent);
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .counter-box {
+            background: rgba(184, 134, 11, 0.08);
+            border: 1px dashed var(--accent);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .counter-unit {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            padding-bottom: 4px;
+        }
+
+        .nos-letter {
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: left;
+            background: var(--box-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+        
+        .sos-btn {
+            display: block;
+            width: 100%;
+            background: #25D366;
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 17px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .anti-stress-btn {
+            display: block;
+            width: 100%;
+            background: #D32F2F;
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 17px;
+            text-decoration: none;
+            margin-bottom: 25px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .music-widget {
+            background: var(--box-bg);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .music-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 120px;
+            -webkit-overflow-scrolling: touch;
+            background: var(--bg);
+        }
+
+        .detail-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .detail-body { padding: 20px; }
+
+        .detail-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+            line-height: 1.2;
+        }
+        
+        .field-group,
+        .guide-section {
+            background: var(--box-bg);
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .field-label,
+        .guide-label {
+            font-size: 13px;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .field-value,
+        .guide-text {
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .gps-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .gps-btn {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            padding: 14px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .apple-maps { background: #000000; }
+        .google-maps { background: #4285F4; }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 25px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--subtext);
+            cursor: pointer;
+        }
+
+        /* CUSTOM MODALS UI */
+        .quiz-opt {
+            display: block; width: 100%; background: #F0F0F0; border: 2px solid transparent; padding: 15px; border-radius: 10px; margin-bottom: 10px; font-size: 15px; text-align: left; cursor: pointer; font-weight: 500; transition: 0.2s;
+        }
+        .quiz-opt.correct { background: #D4EDDA; border-color: #28A745; color: #155724; }
+        .quiz-opt.wrong { background: #F8D7DA; border-color: #DC3545; color: #721C24; }
+
+        .passport-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stamp-box { border: 2px dashed #ccc; border-radius: 50%; width: 100px; height: 100px; margin: 0 auto; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; color: #aaa; cursor: pointer; transition: 0.3s; position: relative; }
+        .stamp-box.stamped { border-color: var(--accent); background: rgba(184, 134, 11, 0.1); color: var(--accent); }
+        .stamp-box i { font-size: 24px; margin-bottom: 5px; }
+        .stamp-box span { font-size: 11px; font-weight: bold; }
+        
+        .star-rating i { font-size: 30px; color: #ccc; cursor: pointer; margin: 0 2px; }
+        .star-rating i.active { color: #FFD700; }
+
+        nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.98);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 calc(25px + env(safe-area-inset-bottom)) 0;
+            z-index: 50;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #A0A0A0;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 700;
+            width: 25%;
+        }
+
+        .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 22px; }
+    </style>
+</head>
+
+<body>
+
+<div id="splash-screen">
+    <img src="logo.jpg" class="splash-logo" onerror="this.src='https://images.unsplash.com/photo-1511895426328-dc8714191300?w=200'">
+</div>
+
+<div id="app-container">
+    <header id="app-header">
+        <button class="back-btn" id="btn-back" onclick="closeDetails()">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+        <div class="header-content" id="header-text-container">
+            <div class="header-title" id="greeting-title">Olá, Juliana! 🤍</div>
+            <div class="header-subtitle" id="header-weather">A Nossa Aventura • A carregar meteorologia...</div>
+        </div>
+
+        <div class="header-title" id="page-title" style="display:none; flex-grow: 1;">Roteiro</div>
+    </header>
+
+    <div id="view-roteiro" class="view active">
+        <div class="roteiro-wrapper" id="roteiro-container"></div>
+    </div>
+
+    <div id="view-guia" class="view">
+        <div class="guia-wrapper" id="guia-container"></div>
+    </div>
+
+    <div id="view-extras" class="view">
+        <div class="extras-wrapper">
+            <div class="vip-card-container" onclick="this.querySelector('.vip-card').classList.toggle('flipped')">
+                <div class="vip-card">
+                    <div class="vip-face vip-front">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <img src="hotel.png" alt="Évora Hotel" style="height: 35px; object-fit: contain;" onerror="this.style.display='none'">
+                            <h2 style="font-size:14px; text-transform:uppercase; letter-spacing:1px;">VIP PASS</h2>
+                        </div>
+                        <div class="chip" style="margin-top:10px;"></div>
+                        <div style="margin-top:20px;">
+                            <h3 style="font-size:20px; letter-spacing: 2px;">Gonçalo & Juliana</h3>
+                            <div style="font-size:11px; margin-top:5px; opacity:0.8;">Membro Exclusivo - 3 Anos</div>
+                        </div>
+                    </div>
+                    <div class="vip-face vip-back">
+                        <h4 style="border-bottom:1px solid #D4AF37; padding-bottom:5px; margin-bottom:10px; font-size:14px; flex-shrink: 0;">Benefícios VIP:</h4>
+                        <div class="vip-back-content">
+                            <ul style="font-size:11px; line-height:1.5; padding-left:15px; margin: 0; display: flex; flex-direction: column; gap: 6px;">
+                                <li>Tarifa especial no alojamento no Évora Hotel</li>
+                                <li>Late check out e early check in, mediante disponibilidade</li>
+                                <li>10% de desconto nos restaurantes, no bar e Wineshop</li>
+                                <li>25% desconto na Visita e Prova na Adega Ervideira e 15% em compras</li>
+                                <li>Desconto na visita à Sé Catedral, Claustro, Tesouro e Terraço - 4€</li>
+                                <li>Desconto na entrada da Igreja Palácio de Cadaval</li>
+                                <li>10% desconto no Kartódromo de Évora</li>
+                                <li>10% desconto no Fluviário de Mora</li>
+                                <li>10% desconto na loja Capote's Emotion</li>
+                                <li>10% desconto nas lojas "O Cesto" e "Olaria Bulhão"</li>
+                                <li>10% desconto na compra dos tapetes de arraiolos</li>
+                                <li>Monte Selvagem: 1 bilhete Criança grátis na compra de 1 Adulto</li>
+                                <li>10% desconto na loja "Gente da minha Terra" em compras superiores a 50€</li>
+                            </ul>
+                        </div>
+                        <div style="font-size:10px; margin-top:5px; opacity:0.6; text-align:center; flex-shrink: 0;">Toca para virar</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Essenciais</div>
+            
+            <div class="feature-btn" onclick="openModal('modal-mala')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-suitcase-rolling icon-main"></i> Checklist da Mala</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+            
+            <div class="feature-btn" onclick="openModal('modal-polaroid')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-camera-retro icon-main"></i> Diário Polaroid</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-capsula')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-hourglass-end icon-main"></i> Cápsula do Tempo</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="section-title">Diversão & Jogos</div>
+
+            <div class="feature-btn" onclick="startQuiz()">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-gamepad icon-main"></i> Quiz dos 3 Anos</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-roleta')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-dharmachakra icon-main"></i> Roleta das Decisões</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-carteira')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-wallet icon-main"></i> Carteira de Beijos</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-passaporte')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-stamp icon-main"></i> Passaporte Alentejano</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-desafios')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-user-secret icon-main"></i> Desafios Secretos</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-preferias')">
+                <div style="display:flex; align-items:center;"><i class="fa-regular fa-comments icon-main"></i> Botão "Preferias...?"</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+            <div class="feature-btn" onclick="openModal('modal-tripadvisor')">
+                <div style="display:flex; align-items:center;"><i class="fa-solid fa-star icon-main"></i> Avaliar Namorado</div>
+                <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="view-nos" class="view">
+        <div class="nos-wrapper">
+            <img class="nos-img" src="casal.jpg" onerror="this.src='https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800'" id="easter-egg-img">
+
+            <div style="font-size: 26px; font-weight: 700; margin-bottom: 4px;">Amor à 1a Vista</div>
+            
+            <div class="counter-box">
+                <div class="counter-unit"><span>Anos juntos:</span><span id="live-years">0</span></div>
+                <div class="counter-unit"><span>Meses:</span><span id="live-months">0</span></div>
+                <div class="counter-unit"><span>Dias:</span><span id="live-days">0</span></div>
+                <div class="counter-unit"><span>Horas:</span><span id="live-hours">0</span></div>
+                <div class="counter-unit"><span>Minutos:</span><span id="live-minutes">0</span></div>
+                <div class="counter-unit"><span>Segundos:</span><span id="live-seconds">0</span></div>
+            </div>
+            
+            <button onclick="sendSOS()" class="sos-btn">
+                <i class="fa-brands fa-whatsapp"></i> SOS Pedido Expresso
+            </button>
+
+            <button onclick="triggerAntiStress()" class="anti-stress-btn">
+                <i class="fa-solid fa-triangle-exclamation"></i> Emergência Anti-Stress
+            </button>
+
+            <div class="music-widget">
+                <div class="music-title">
+                    <i class="fa-brands fa-apple" style="font-size: 16px; color: var(--accent);"></i> A Nossa Playlist
+                </div>
+                <iframe allow="autoplay *; encrypted-media *; fullscreen *" frameborder="0" height="150" style="width:100%; border-radius: 12px; background: transparent;" src="https://embed.music.apple.com/pt/playlist/%C3%A9voraaa/pl.u-BNA6Yj6IemkDVbo?l=en"></iframe>
+            </div>
+
+            <div class="nos-letter">
+                Juliana,<br><br>
+                Preparei este pequeno guia para que o nosso fim de semana seja perfeito e sem preocupações, porque tu mereces o mundo. <br><br>
+                Foram 3 anos incríveis, cheios de aventuras e amor. Que esta viagem a Évora seja apenas mais um capítulo inesquecível.<br><br>
+                Amo-te muito! 🤍<br>
+                <strong>— Gonçalo</strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-details" class="view">
+        <div class="detail-content" id="detail-container"></div>
+    </div>
+
+    <div id="modal-contrato" class="modal" style="z-index: 10001;">
+        <div class="modal-content" style="text-align: center;">
+            <i class="fa-solid fa-file-signature" style="font-size: 40px; color: var(--accent); margin-bottom: 15px;"></i>
+            <h3 style="margin-bottom:15px;">Termos e Condições</h3>
+            <p style="font-size:14px; color:var(--subtext); margin-bottom:15px; text-align: left; line-height: 1.6;">
+                Bem-vinda à nossa viagem de 3 Anos! Ao clicar em aceitar, a <strong>Juliana</strong> compromete-se legalmente a:<br><br>
+                1. Não falar nem pensar em trabalho.<br>
+                2. Aceitar que as calorias em Évora não contam.<br>
+                3. Dar a mão ao seu guia (Gonçalo) sempre que possível.<br>
+                4. Estar pronta para muitas surpresas e beijos.
+            </p>
+            <button onclick="assinarContrato()" style="width:100%; background:var(--accent); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">
+                Aceito e Prometo! ❤️
+            </button>
+        </div>
+    </div>
+
+    <div id="modal-mala" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('modal-mala')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-suitcase"></i> Fazer a Mala</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Clima: Dia >30ºC | Noite ~16ºC</p>
+            <div id="checklist-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+    </div>
+
+    <div id="modal-quiz" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-quiz')"><i class="fa-solid fa-xmark"></i></button>
+            <div style="color:var(--accent); font-size:12px; font-weight:700; margin-bottom:10px; text-transform:uppercase;" id="quiz-progress">Pergunta 1/5</div>
+            <h3 id="quiz-q" style="margin-bottom:25px; line-height:1.4; font-size:20px;"></h3>
+            <div id="quiz-opts" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
+            <button id="quiz-next" onclick="nextQuestion()" style="display:none; width:100%; background:var(--text); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">Próxima <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <div id="modal-video" class="modal">
+        <div class="modal-content" style="padding:10px; background:black;">
+            <button class="close-modal" style="color:white; z-index:99;" onclick="closeModal('modal-video')"><i class="fa-solid fa-xmark"></i></button>
+            <video id="easter-video" controls style="width:100%; border-radius:10px;"><source src="surpresa.mp4" type="video/mp4"></video>
+        </div>
+    </div>
+
+    <div id="modal-roleta" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-roleta')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-dharmachakra"></i> Roleta das Decisões</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:25px;">Quando não souberem quem faz o quê...</p>
+            <div id="roleta-resultado" style="font-size:22px; font-weight:900; color:var(--accent); height:80px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; background:var(--box-bg); border-radius:12px; border:1px solid var(--border); padding:10px;">
+                Clica para girar!
+            </div>
+            <button onclick="girarRoleta()" style="width:100%; background:var(--text); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">Girar Roleta 🎡</button>
+        </div>
+    </div>
+
+    <div id="modal-capsula" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-capsula')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-hourglass-end"></i> Cápsula do Tempo</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Escrevam uma mensagem e trancam. Só abre no Domingo às 17h00 quando chegarem!</p>
+            
+            <div id="capsula-escrever" style="display:block;">
+                <textarea id="capsula-texto" rows="5" style="width:100%; padding:15px; border-radius:10px; border:1px solid #ccc; font-size:14px; font-family:inherit; margin-bottom:15px;" placeholder="Escrevam aqui as vossas expetativas..."></textarea>
+                <button onclick="trancarCapsula()" style="width:100%; background:var(--accent); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">Trancar Cápsula 🔒</button>
+            </div>
+
+            <div id="capsula-trancada" style="display:none; padding: 20px; background:var(--box-bg); border-radius: 12px; border:1px solid var(--border);">
+                <i class="fa-solid fa-lock" style="font-size:40px; color:var(--accent); margin-bottom:15px;"></i>
+                <div style="font-weight:bold; margin-bottom:10px;">Cápsula Selada</div>
+                <div style="font-size:13px; color:var(--subtext);">Data de Abertura:<br>31 de Maio, 17:00</div>
+            </div>
+
+            <div id="capsula-aberta" style="display:none;">
+                <i class="fa-solid fa-lock-open" style="font-size:30px; color:#25D366; margin-bottom:15px;"></i>
+                <div style="font-weight:bold; margin-bottom:10px;">A vossa mensagem:</div>
+                <div id="capsula-leitura" style="font-size:15px; font-style:italic; padding:15px; background:var(--box-bg); border-radius:10px; text-align:left; border:1px solid var(--border);"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-passaporte" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-passaporte')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-stamp"></i> Passaporte Alentejano</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Cliquem para carimbar as iguarias que já comeram!</p>
+            <div class="passport-grid" id="passport-grid">
+                </div>
+        </div>
+    </div>
+
+    <div id="modal-carteira" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-carteira')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-wallet"></i> AmorWay (Beijos)</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">A Juliana tem um saldo inicial. Paga o que quiseres com beijos.</p>
+            
+            <div style="background:var(--accent); color:white; padding:20px; border-radius:16px; margin-bottom:20px;">
+                <div style="font-size:12px; text-transform:uppercase; font-weight:bold; opacity:0.8;">Saldo Disponível</div>
+                <div style="font-size:40px; font-weight:900;"><span id="saldo-beijos">50</span> <i class="fa-solid fa-lips" style="font-size:30px;"></i></div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button onclick="pagarBeijos('Pagar um Café', 2)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Pagar um Café</span> <span>2 Beijos</span></button>
+                <button onclick="pagarBeijos('Massagem aos pés', 15)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Massagem aos pés</span> <span>15 Beijos</span></button>
+                <button onclick="pagarBeijos('Pagar o Jantar', 30)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Pagar o Jantar</span> <span>30 Beijos</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-desafios" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-desafios')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-user-secret"></i> Desafios Secretos</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:25px;">Escolhe o teu nome para receberes uma missão secreta.</p>
+            
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button onclick="gerarDesafio('Juliana')" style="flex:1; background:#E91E63; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:15px; cursor:pointer;">Juliana 👩</button>
+                <button onclick="gerarDesafio('Gonçalo')" style="flex:1; background:#1976D2; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:15px; cursor:pointer;">Gonçalo 👨</button>
+            </div>
+
+            <div id="desafio-box" style="display:none; font-size:18px; font-weight:bold; padding:20px; background:var(--box-bg); border:1px solid var(--accent); border-radius:12px; color:var(--text);">
+                </div>
+        </div>
+    </div>
+
+    <div id="modal-preferias" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-preferias')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-regular fa-comments"></i> Preferias...?</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Dilemas difíceis para puxar conversa.</p>
+            
+            <div id="preferias-texto" style="font-size:22px; font-weight:900; line-height:1.4; margin-bottom:30px; padding:20px; background:var(--box-bg); border-radius:12px;">
+                Prontos para jogar?
+            </div>
+            
+            <button onclick="gerarPreferias()" style="width:100%; background:var(--accent); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">Gerar Pergunta 🔄</button>
+        </div>
+    </div>
+
+    <div id="modal-tripadvisor" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <button class="close-modal" onclick="closeModal('modal-tripadvisor')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="margin-bottom:10px;"><i class="fa-solid fa-star"></i> TripAdvisor do Namorado</h3>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Avalia a performance do Gonçalo como guia turístico.</p>
+            
+            <div style="margin-bottom:20px; text-align:left;">
+                <div style="font-weight:bold; margin-bottom:5px;">Qualidade do Roteiro</div>
+                <div class="star-rating" data-cat="1" onclick="rateStar(event, 1)">
+                    <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+                </div>
+            </div>
+            <div style="margin-bottom:20px; text-align:left;">
+                <div style="font-weight:bold; margin-bottom:5px;">Escolhas Gastronómicas</div>
+                <div class="star-rating" data-cat="2" onclick="rateStar(event, 2)">
+                    <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+                </div>
+            </div>
+            <div style="margin-bottom:25px; text-align:left;">
+                <div style="font-weight:bold; margin-bottom:5px;">Nível de Romantismo</div>
+                <div class="star-rating" data-cat="3" onclick="rateStar(event, 3)">
+                    <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+                </div>
+            </div>
+
+            <button onclick="submeterAvaliacao()" style="width:100%; background:var(--text); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">Submeter Avaliação</button>
+        </div>
+    </div>
+
+    <div id="modal-polaroid" class="modal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal('modal-polaroid')">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h3 style="margin-bottom:10px;">
+            <i class="fa-solid fa-camera"></i> Polaroid
+        </h3>
+
+        <p style="font-size:13px; color:var(--subtext); margin-bottom:15px;">
+            Podes importar uma foto já editada ou tirar uma foto diretamente na app.
+        </p>
+
+        <input
+            type="text"
+            id="polaroid-loc"
+            placeholder="Local da Foto (ex: Templo Romano)"
+            style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px; font-size:15px;"
+        >
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+            <label style="display:block; text-align:center; background:#111; color:white; padding:14px; border-radius:10px; font-weight:800; cursor:pointer;">
+                Importar foto editada
+                <input type="file" accept="image/*" id="camera-input-import" style="display:none;">
+            </label>
+
+            <label style="display:block; text-align:center; background:#f0f0f0; color:#111; padding:14px; border-radius:10px; font-weight:800; cursor:pointer; border:1px solid #ddd;">
+                Tirar foto na app
+                <input type="file" accept="image/*" capture="environment" id="camera-input-camera" style="display:none;">
+            </label>
+        </div>
+
+        <button
+    id="toggle-filter-controls"
+    type="button"
+    onclick="toggleFilterControls()"
+    style="display:none; width:100%; background:#f4f4f4; color:#111; border:1px solid #ddd; padding:13px 14px; border-radius:10px; font-weight:800; margin-bottom:12px; cursor:pointer; text-align:center;"
+>
+    <span id="toggle-filter-text">Ajustar filtro</span>
+    <i id="toggle-filter-icon" class="fa-solid fa-chevron-down" style="margin-left:8px;"></i>
+</button>
+
+<div id="filter-controls" style="display:none; background:var(--box-bg); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:15px;">
+    <div style="font-size:13px; font-weight:700; margin-bottom:12px; color:var(--text);">
+        Ajuste fino do filtro interno
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+            <span>Intensidade</span>
+            <span id="dazz-strength-val">50</span>
+        </div>
+        <input type="range" id="dazz-strength" min="0" max="100" value="50" style="width:100%;">
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+            <span>Temperatura</span>
+            <span id="dazz-temp-val">-6</span>
+        </div>
+        <input type="range" id="dazz-temp" min="-15" max="15" value="-6" style="width:100%;">
+    </div>
+
+    <div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+            <span>Contraste</span>
+            <span id="dazz-contrast-val">104</span>
+        </div>
+        <input type="range" id="dazz-contrast" min="90" max="125" value="104" style="width:100%;">
+    </div>
+</div>
+
+        <canvas
+            id="canvas-polaroid"
+            style="width:100%; display:none; border:1px solid #ddd; border-radius:4px; margin-top:10px; box-shadow:0 5px 15px rgba(0,0,0,0.2);"
+        ></canvas>
+
+        <a
+            id="download-polaroid"
+            style="display:none; text-align:center; background:var(--accent); color:white; padding:15px; border-radius:10px; margin-top:20px; font-weight:bold; text-decoration:none;"
+        >
+            Guardar no Telemóvel
+        </a>
+    </div>
+    </div>
+
+    <nav id="bottom-nav">
+        <div class="nav-item active" id="tab-roteiro" onclick="switchTab('roteiro')">
+            <i class="fa-solid fa-route"></i><span>ROTEIRO</span>
+        </div>
+        <div class="nav-item" id="tab-guia" onclick="switchTab('guia')">
+            <i class="fa-solid fa-book-open"></i><span>GUIA</span>
+        </div>
+        <div class="nav-item" id="tab-extras" onclick="switchTab('extras')">
+            <i class="fa-solid fa-wand-magic-sparkles"></i><span>EXTRAS</span>
+        </div>
+        <div class="nav-item" id="tab-nos" onclick="switchTab('nos')">
+            <i class="fa-solid fa-heart"></i><span>(NÓS)</span>
+        </div>
+    </nav>
+</div>
+
+<script>
+    const CHEAT_MODE = false; 
+
+    const roteiroData = [
+        {
+            realDate: "2026-05-20T10:00:00",
+            day: "sábado, 30 maio",
+            time: "10h00",
+            title: "Chegada a Évora",
+            location: "Praça do Giraldo",
+            details: "O momento em que começamos as nossas mini-férias. Vamos estacionar o carro perto das muralhas e respirar o ar do Alentejo!",
+            img: "https://cdn.travel-in-portugal.com/sites/default/files/photos/evora-praca-giraldo.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-20T10:30:00",
+            day: "sábado, 30 maio",
+            time: "10h30",
+            title: "Compras e Lembranças (Usar Cartão!)",
+            location: "Rua 5 de Outubro",
+            details: "Passeio de mãos dadas pela rua mais emblemática da cidade. Vamos aproveitar o nosso cartão VIP do hotel para escolher uma lembrança especial para marcar os nossos 3 anos em cortiça ou cerâmica.",
+            img: "https://www.cm-evora.pt/wp-content/uploads/2022/05/Rua5Outubro-scaled.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-20T11:00:00",
+            day: "sábado, 30 maio",
+            time: "11h00",
+            title: "A vista mais alta da cidade",
+            location: "Sé de Évora",
+            details: "Vamos subir aos telhados da maior catedral medieval de Portugal. Prepara a câmara, a vista panorâmica lá de cima sobre as planícies alentejanas é de cortar a respiração!",
+            img: "https://cdn.visitportugal.com/sites/default/files/styles/encontre_detalhe_poi_destaque/public/mediateca/Evora-SeCatedral-Shutterstock-Fotoeventis-Visit3.jpg?itok=2MruR5F0",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-20T11:45:00",
+            day: "sábado, 30 maio",
+            time: "11h45",
+            title: "Templo Romano & Palácio Cadaval",
+            location: "Templo Romano Évora",
+            details: "Viagem no tempo até à época dos imperadores. Um cenário épico para umas fotos incríveis juntos, com direito a espreitar os azulejos do Palácio Cadaval (aproveitando o desconto do cartão).",
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0MfDkYMG1yMGZCM8mbcakslZHDWsB8m2JEg&s",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-20T13:00:00",
+            day: "sábado, 30 maio",
+            time: "13h00",
+            title: "Primeiro Almoço Alentejano",
+            location: "Centro Histórico",
+            details: "A primeira paragem gastronómica. Altura para provarmos as famosas migas alentejanas ou a carne de porco preto num ambiente típico.",
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDA55Wvzl6se5oF1FrV0NuNjD2oIx_uiFO7g&s",
+            isSurprise: true
+        },
+        {
+            realDate: "2026-05-20T14:30:00",
+            day: "sábado, 30 maio",
+            time: "14h30",
+            title: "Mistério e Natureza",
+            location: "Capela dos Ossos Évora",
+            details: "Uma visita ao local mais intrigante de Évora (a Capela dos Ossos), seguida de um passeio relaxante pelo Jardim Público para ver os pavões e namorar junto às Ruínas Fingidas.",
+            img: "https://www.penaestrada.blog.br/wp-content/uploads/2025/12/Capela-dos-Ossos-17.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-20T16:00:00",
+            day: "sábado, 30 maio",
+            time: "16h00",
+            title: "Modo Spa: Relaxar ao máximo",
+            location: "Évora Hotel",
+            details: "O nosso momento de puro relaxamento! Fazer o check-in, vestir o roupão e aproveitar a piscina interior, o jacuzzi e a sauna do hotel até às 20h. Merecemos.",
+            img: "https://www.cm-evora.pt/wp-content/uploads/2020/05/%C3%89vora-Hotel.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-20T20:30:00",
+            day: "sábado, 30 maio",
+            time: "20h30",
+            title: "Jantar de Aniversário 🥂",
+            location: "Restaurante O Fialho",
+            details: "O ponto alto do dia. Um jantar romântico, à luz das velas e com vinho do bom, para brindarmos a nós e a estes 3 anos maravilhosos de namoro.",
+            img: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/08/34/2c/db/restaurante-o-fialho.jpg?w=900&h=500&s=1",
+            isSurprise: true
+        },
+        {
+            realDate: "2026-05-20T22:30:00",
+            day: "sábado, 30 maio",
+            time: "22h30",
+            title: "Évora Iluminada",
+            location: "Templo Romano Évora",
+            details: "Um passeio noturno sob as estrelas. O Templo Romano iluminado à noite ganha uma magia e uma paz completamente diferentes.",
+            img: "https://expressinha.com/wp-content/uploads/2012/10/Expressinha-%C3%89vora-48.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-21T09:30:00",
+            day: "domingo, 31 maio",
+            time: "09h30",
+            title: "Pequeno-Almoço",
+            location: "Évora Hotel",
+            details: "Acordar sem pressas. Vamos aproveitar bem o pequeno-almoço do hotel para ganhar energia para a aventura de hoje.",
+            img: "https://cdn.visitportugal.com/sites/default/files/styles/encontre_detalhe_poi_destaque/public/mediateca/Evora%20Hotel_D_0.jpg?itok=nR0ltg_g",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-21T10:30:00",
+            day: "domingo, 31 maio",
+            time: "10h30",
+            title: "Pedalar na História",
+            location: "Aqueduto da Água de Prata",
+            details: "Hora da aventura! Vamos alugar bicicletas e fazer o trilho ecológico a pedalar lado a lado com os arcos gigantes do aqueduto do século XVI.",
+            img: "https://www.radiocampanario.com/wp-content/uploads/2019/08/05bccb81df4f0508e55c00c200387c1c.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-21T11:30:00",
+            day: "domingo, 31 maio",
+            time: "11h30",
+            title: "Regresso às Aulas (séc. XVI)",
+            location: "Universidade de Évora",
+            details: "Visita aos claustros de mármore e às salas de aula históricas (forradas a azulejos) da segunda universidade mais antiga de Portugal.",
+            img: "https://www.visitevora.net/wp-content/uploads/2014/01/universidade-evora.jpg",
+            isSurprise: false
+        },
+        {
+            realDate: "2026-05-21T13:00:00",
+            day: "domingo, 31 maio",
+            time: "13h00",
+            title: "Almoço Leve (Tapas)",
+            location: "Botequim da Mouraria",
+            details: "Para não irmos de barriga demasiado cheia para a prova de vinhos, vamos picar umas tapas, queijos e iguarias regionais.",
+            img: "https://saltofportugal.com/wp-content/uploads/2014/08/botequimdamouraria-editc2a9.jpg",
+            isSurprise: true
+        },
+        {
+            realDate: "2026-05-21T14:30:00",
+            day: "domingo, 31 maio",
+            time: "14h30",
+            title: "Prova de Vinhos a Dois 🍷",
+            location: "Ervideira Wine Shop",
+            details: "A nossa primeira prova de vinhos a dois! Vamos aprender sobre aromas, provar o famoso vinho branco 'Invisível' e aproveitar a nossa oferta exclusiva do cartão do hotel.",
+            img: "https://ervideira.pt/wp-content/uploads/2019/03/evora07.jpg",
+            isSurprise: true
+        },
+        {
+            realDate: "2026-05-21T16:00:00",
+            day: "domingo, 31 maio",
+            time: "16h00",
+            title: "Fim de Semana Épico Concluído",
+            location: "Cristo Rei, Almada",
+            details: "Com o coração cheio, a barriga feliz e as baterias recarregadas, fazemo-nos à estrada de volta a Almada, já a pensar na nossa próxima viagem.",
+            img: "https://www.nacionalidadeportuguesa.com.br/wp-content/uploads/2019/12/cristorei.jpg",
+            isSurprise: false
+        }
+    ];
+
+    const guiaData = [
+        {
+            title: "Praça do Giraldo",
+            historia: `É o epicentro da vida eborense. Antes de ser esta praça elegante, era aqui que acabava a cidade romana. Em 1165, a cidade (que estava sob domínio mouro) foi reconquistada num ataque noturno brutal por Geraldo "Sem Pavor". Com o passar dos séculos, a praça tornou-se o centro de tudo: desde o mercado principal, até ao palco negro dos Autos-de-Fé da Inquisição Portuguesa (onde as pessoas eram julgadas e queimadas) e onde o Duque de Bragança foi decapitado por traição em 1483.`,
+            observar: `O Chafariz e as Ruas: O belíssimo chafariz de mármore branco foi construído em 1571. Reparem que tem exatamente 8 bicas de água. Cada bica aponta simbolicamente para uma das 8 ruas principais de Évora que vêm dar à praça.\n\nAs Arcadas: Notem como as arcadas ao longo da praça não são todas iguais; elas foram sendo construídas em diferentes épocas pelas famílias abastadas para dar sombra e abrigar as lojas.`,
+            segredo: `• O Robin dos Bosques Alentejano: A tática de Geraldo Sem Pavor foi digna de um filme. Ele e o seu pequeno exército cravaram lanças nas muralhas a meio da noite para trepar, mataram os sentinelas mouros e abriram as portas para a conquista.\n• O Brasão: O brasão oficial da cidade de Évora tem no centro precisamente o Geraldo Sem Pavor a cavalo, a segurar uma espada ensanguentada.`,
+            img: "https://images.unsplash.com/photo-1693764315871-06ae57ce58ee?q=80&w=1171&auto=format&fit=crop"
+        },
+        {
+            title: "Sé de Évora",
+            historia: `A Sé Basílica de Nossa Senhora da Assunção é a maior catedral medieval de Portugal. A sua construção começou em 1186, no local onde existia uma antiga mesquita árabe. Évora era uma das cidades mais ricas do reino, e isso reflete-se na mistura épica de estilos: começou por ser construída num estilo Românico (parece uma fortaleza pesada e defensiva, com granito escuro) e foi sendo acabada no estilo Gótico, com pormenores mais altos e elegantes.`,
+            observar: `Assimetria das Torres: Olhem para a fachada principal. As duas grandes torres são propositadamente diferentes. A da direita (Torre dos Sinos) é robusta. A da esquerda tem um telhado cónico forrado a azulejos azuis e brancos, adicionados muito mais tarde.\n\nO Zimbório: Subindo ao telhado, reparem na cúpula central (zimbório) em forma de coroa, que servia para deixar a luz do sol inundar o altar principal de forma dramática.`,
+            segredo: `• A Santa Rara: No pórtico principal (a entrada), olhem para as estátuas dos Apóstolos. Ao centro está uma figura raríssima: Nossa Senhora grávida, também conhecida como Nossa Senhora do Ó.\n• As Bandeiras da Índia: Foi nesta exata catedral que, em 1497, o rei D. Manuel I entregou as bandeiras da frota a Vasco da Gama, que foram aqui benzidas antes da épica viagem de descoberta do caminho marítimo para a India.\n• O Órgão Mais Antigo: Lá dentro encontra-se um órgão de tubos do século XVI, o mais antigo de Portugal que ainda funciona!`,
+            img: "https://images.unsplash.com/photo-1638273457292-68db0aa6169f?q=80&w=876&auto=format&fit=crop"
+        },
+        {
+            title: "Templo Romano",
+            historia: `É o ex-líbris de Évora e um dos monumentos romanos mais bem preservados de toda a Península Ibérica, erguido no século I d.C. Fazia parte do fórum (a praça pública principal) da cidade romana, que na altura se chamava Liberalitas Julia. Era o local de culto ao Imperador Augusto, que era venerado como um deus. Apenas as figuras mais importantes da sociedade podiam subir as escadarias para os rituais.`,
+            observar: `Os Materiais: Olhem para a estrutura. A base (o pódio) é feita de blocos maciços de granito da região. Mas reparem no topo das colunas (os capitéis, de estilo coríntio com folhas de acanto): são feitos de mármore branco esculpido, trazido de Estremoz. Apenas 14 das colunas originais sobreviveram de pé.`,
+            segredo: `• O Mito de Diana: Quase toda a gente o chama "Templo de Diana" (a deusa da caça), mas isso é uma mentira histórica! Esse mito foi inventado no século XVII por um padre (Manuel Fialho) para dar um ar mais poético à cidade.\n• O Açougue Salvador: Como é que não foi destruído? Na Idade Média, o espaço entre as colunas foi preenchido com tijolos e cimento para fazer as paredes de um cofre. Mais tarde, virou a sala de abate do matadouro municipal (um açougue)! Ironicamente, foram essas paredes de tijolo que "seguraram" as colunas romanas e as salvaram da demolição. As paredes só foram retiradas no final do século XIX.`,
+            img: "https://images.unsplash.com/photo-1717761509222-a4debf3b921b?q=80&w=1170&auto=format&fit=crop"
+        },
+        {
+            title: "Capela dos Ossos",
+            historia: `No século XVII, havia cerca de 42 cemitérios monásticos a ocupar demasiado espaço na cidade de Évora. A solução dos monges franciscanos não foi deitar os ossos fora, mas sim criar um "Memento Mori" (lembra-te que vais morrer). Recolheram cerca de 5000 esqueletos e construíram esta capela interior na Igreja de São Francisco. O objetivo não era assustar, mas sim servir de sala de meditação sobre o facto de as riquezas e os problemas da vida serem temporários.`,
+            observar: `A Disposição Artística: Notem que os ossos não estão apenas amontoados. Foram cuidadosamente colados com cimento, e os crânios estão colocados de forma a desenhar padrões geométricos ao longo dos pilares e paredes.\n\nO Teto: Olhem para cima. Ao contrário das paredes macabras, a abóbada é pintada com frescos alegres e passagens bíblicas, simbolizando que a morte não é o fim, mas uma passagem para a luz.`,
+            segredo: `• A Mensagem na Porta: A famosa inscrição à entrada "Nós ossos que aqui estamos pelos vossos esperamos" é a verdadeira essência da capela.\n• As Múmias: Estão dois corpos inteiros ressequidos pendurados. A lenda popular dizia que era um homem e o seu filho, amaldiçoados pela mulher/mãe que maltratavam. A ciência já provou que é mito: são apenas corpos que, devido às condições do solo do cemitério onde estavam, mumificaram naturalmente em vez de se decomporem.\n• O Poema Escondido: Num dos pilares está um poema do padre António da Ascensão que diz: "Onde vais, caminhante, acelerado? Pára... não tens que passar mais avante."`,
+            img: "https://upload.wikimedia.org/wikipedia/commons/3/34/Capilla_de_los_huesos%2C_%C3%89vora.jpg"
+        },
+        {
+            title: "Aqueduto da Água de Prata",
+            historia: `A cidade de Évora sofria de secas terríveis e falta de água potável. Em 1531, o rei D. João III ordenou a construção deste colosso de engenharia renascentista com 18 quilómetros de extensão. Foi desenhado pelo mestre Francisco de Arruda — o mesmo arquiteto genial que projetou a Torre de Belém em Lisboa!`,
+            observar: `A Adaptação ao Terreno: Olhem para o tamanho dos arcos. Fora da cidade chegam a ter 26 metros de altura para atravessar os vales. À medida que entram na cidade, vão ficando cada vez mais baixos até desaparecerem no chão.\n\nA Rua do Cano: Este é o detalhe mais incrível. Se caminharem pela "Rua do Cano", vão ver as casas lá construídas.`,
+            segredo: `• Casas Dentro da História: A certa altura, as pessoas começaram a construir as suas próprias casas aproveitando a estrutura do aqueduto para poupar nas paredes. Hoje, podem literalmente ver cafés e salas de estar espremidas debaixo e por entre os arcos de pedra de quinhentos anos!\n• O Nome: Chama-se "Água de Prata" não porque tivesse prata, mas porque a água chegava finalmente tão limpa e cristalina à Praça do Giraldo que brilhava como prata ao sol. (Outra teoria diz que a obra custou tantos impostos em prata que o povo lhe deu este nome irónico).`,
+            img: "https://images.unsplash.com/photo-1727816393452-a0c59109d2cb?q=80&w=1174&auto=format&fit=crop"
+        },
+        {
+            title: "Universidade de Évora",
+            historia: `É a segunda universidade mais antiga do país (logo a seguir a Coimbra), fundada em 1559 pelo Cardeal D. Henrique (que mais tarde seria Rei). As instalações principais (o Colégio do Espírito Santo) foram entregues à Companhia de Jesus (os Jesuítas), que a tornaram num dos maiores centros de conhecimento da Europa renascentista.`,
+            observar: `O Claustro de Mármore: O pátio central (claustro) tem dois andares incríveis sustentados por colunas de mármore. É de uma simetria perfeita e era aqui que os estudantes e professores debatiam as ideias da época.\n\nAs Salas de Aula (Azulejos): Tentem espreitar para dentro de uma sala de aula. As paredes estão todas forradas a azulejos barrocos que contam uma história sobre a disciplina ali ensinada (ex: na sala de Matemática há azulejos com contas e geometria; na de Teologia há cenas divinas).`,
+            segredo: `• O Encerramento Surpresa: A Universidade teve um fim abrupto. Em 1759, o Marquês de Pombal (que odiava o poder dos Jesuítas) expulsou a ordem religiosa de Portugal. A universidade de Évora foi fechada a cadeado e assim ficou, ao abandono ou usada como liceu, durante quase 200 anos! Só voltou a reabrir oficialmente em 1973.\n• As Cátedras: Em muitas salas de aula, os professores ainda hoje dão aulas em cima das "cátedras" originais do século XVIII (púlpitos altos de madeira trabalhada), parecendo algo saído dos filmes de magia.`,
+            img: "https://www.visitevora.net/wp-content/uploads/2014/01/universidade-evora.jpg"
+        }
+    ];
+
+    window.onload = () => {
+        // Verificar contrato diário
+        const hoje = new Date().toLocaleDateString('pt-PT');
+        if(localStorage.getItem('contratoAssinadoData') !== hoje) {
+            document.getElementById('modal-contrato').style.display = 'flex';
+        }
+
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.opacity = '0';
+            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+        }, 1500);
+
+        fetchWeather();
+        setDynamicHeader();
+        updateLiveCounter();
+        setInterval(updateLiveCounter, 1000);
+        
+        renderRoteiro(); 
+        renderGuia();   
+        
+        renderChecklist();
+        renderPassaporte();
+        carregarCarteira();
+        verificarCapsula();
+    };
+
+    function assinarContrato() {
+        const hoje = new Date().toLocaleDateString('pt-PT');
+        localStorage.setItem('contratoAssinadoData', hoje);
+        closeModal('modal-contrato');
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+    }
+
+    function fetchWeather() {
+        fetch('https://api.open-meteo.com/v1/forecast?latitude=38.5667&longitude=-7.9&current_weather=true')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('header-weather').innerText = `A Nossa Aventura • ☀️ ${Math.round(d.current_weather.temperature)}°C Évora`;
+            })
+            .catch(() => {
+                document.getElementById('header-weather').innerText = `A Nossa Aventura • Évora`;
+            });
+    }
+
+    function renderRoteiro() {
+        const container = document.getElementById('roteiro-container');
+        let currentDay = "";
+        let html = "";
+        const now = new Date();
+
+        roteiroData.forEach((item, index) => {
+            if (item.day !== currentDay) {
+                if (currentDay !== "") html += `</div>`; 
+                html += `<div class="day-header"><i class="fa-regular fa-calendar" style="color:var(--accent); margin-right:6px;"></i>${item.day}</div><div class="timeline-container"><div class="timeline-line"></div>`;
+                currentDay = item.day;
+            }
+
+            const diffMs = new Date(item.realDate) - now;
+            const isPast = !CHEAT_MODE && diffMs < -3600000;
+            const isCurrent = !CHEAT_MODE && diffMs > -3600000 && diffMs <= 3600000;
+            const isLocked = !CHEAT_MODE && diffMs > 3600000;
+            const statusClass = isPast ? "past" : isCurrent ? "current" : "";
+            
+            if (isLocked && item.isSurprise) {
+                html += `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="list-item" style="background: #2C1E16; border: 1px solid var(--accent); justify-content: center; min-height: 100px; pointer-events: none;">
+                            <div style="text-align: center; color: var(--accent);">
+                                <i class="fa-solid fa-lock" style="font-size:24px; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 700; font-size: 15px;">Surpresa Especial 🤫</div>
+                                <div style="font-size: 11px; margin-top: 4px; color: rgba(255,255,255,0.7);">Desbloqueia 1h antes</div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else if (isLocked) {
+                html += `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="list-item locked blur">
+                            <div class="lock-overlay" style="background:transparent;">
+                                <i class="fa-solid fa-clock" style="font-size:32px; color: var(--text); background: rgba(255,255,255,0.9); border-radius: 50%; padding: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></i>
+                            </div>
+                            <img class="list-img" src="${item.img}">
+                            <div class="list-content">
+                                <span class="list-time">${item.time}</span>
+                                <div class="list-title">${item.title}</div>
+                                <div class="list-subtitle"><i class="fa-solid fa-location-dot" style="color:var(--accent); font-size:11px;"></i> ${item.location.split(',')[0]}</div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right list-arrow"></i>
+                        </div>
+                    </div>`;
+            } else {
+                html += `
+                    <div class="timeline-item">
+                        <div class="timeline-dot ${isCurrent ? 'current' : ''}"></div>
+                        <div class="list-item ${statusClass}" onclick="openDetails('roteiro', ${index})">
+                            <img class="list-img" src="${item.img}">
+                            <div class="list-content">
+                                <span class="list-time">${item.time}</span>
+                                <div class="list-title">${item.title}</div>
+                                <div class="list-subtitle"><i class="fa-solid fa-location-dot" style="color:var(--accent); font-size:11px;"></i> ${item.location.split(',')[0]}</div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right list-arrow"></i>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        if (currentDay !== "") html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    function renderGuia() {
+        const container = document.getElementById('guia-container');
+        let html = "";
+        const now = new Date();
+
+        guiaData.forEach((item, index) => {
+            const searchStr = item.title.toLowerCase().replace(' évora', '').trim();
+            const match = roteiroData.find(r => r.location.toLowerCase().includes(searchStr) || r.title.toLowerCase().includes(searchStr));
+
+            let isLocked = false;
+            let isSurprise = false;
+
+            if (match) {
+                const diffMs = new Date(match.realDate) - now;
+                isLocked = !CHEAT_MODE && diffMs > 3600000; 
+                isSurprise = match.isSurprise;
+            }
+
+            if (isLocked && isSurprise) {
+                html += `
+                    <div class="card" style="background: #2C1E16; border: 1px solid var(--accent); display: flex; justify-content: center; align-items: center; min-height: 220px; pointer-events: none;">
+                        <div style="text-align: center; color: var(--accent);">
+                            <i class="fa-solid fa-lock" style="font-size:32px; margin-bottom: 12px;"></i>
+                            <div style="font-weight: 700; font-size: 18px;">Guia Secreto 🤫</div>
+                            <div style="font-size: 12px; margin-top: 6px; color: rgba(255,255,255,0.7);">Desbloqueia 1h antes de lá chegarem</div>
+                        </div>
+                    </div>`;
+            } else if (isLocked) {
+                html += `
+                    <div class="card locked" style="pointer-events: none; position: relative;">
+                        <div class="lock-overlay" style="background:transparent;">
+                            <i class="fa-solid fa-clock" style="font-size:36px; color: var(--text); background: rgba(255,255,255,0.9); border-radius: 50%; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);"></i>
+                        </div>
+                        <img class="card-img" src="${item.img}">
+                        <div class="card-body">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-desc" style="-webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;">${item.historia}</div>
+                        </div>
+                    </div>`;
+            } else {
+                html += `
+                    <div class="card" onclick="openDetails('guia', ${index})">
+                        <img class="card-img" src="${item.img}">
+                        <div class="card-body">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-desc" style="-webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;">${item.historia}</div>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        container.innerHTML = html;
+    }
+
+    let currentTab = 'roteiro';
+    let confettiFired = false;
+
+    function switchTab(tab) {
+        currentTab = tab;
+
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(`view-${tab}`).classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        
+        document.getElementById('btn-back').style.display = 'none';
+
+        if (tab === 'roteiro') {
+            document.getElementById('header-text-container').style.display = 'block';
+            document.getElementById('page-title').style.display = 'none';
+        } else {
+            document.getElementById('header-text-container').style.display = 'none';
+            document.getElementById('page-title').style.display = 'block';
+
+            if (tab === 'guia') document.getElementById('page-title').innerText = 'Guia Turístico';
+            if (tab === 'extras') document.getElementById('page-title').innerText = 'Extras VIP';
+
+            if (tab === 'nos') {
+                document.getElementById('page-title').innerText = '(Nós)';
+
+                if (!confettiFired) {
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.5 },
+                        colors: ['#D4AF37', '#FFDF00', '#ffffff']
+                    });
+
+                    confettiFired = true;
+                }
+            }
+        }
+    }
+
+    function openDetails(type, index) {
+        const container = document.getElementById('detail-container');
+        let html = "";
+
+        if (type === 'roteiro') {
+            const data = roteiroData[index];
+
+            document.getElementById('header-text-container').style.display = 'none';
+            document.getElementById('page-title').style.display = 'block';
+            document.getElementById('page-title').innerText = data.time;
+            
+            const appleMapsLink = `http://maps.apple.com/?q=${encodeURIComponent(data.location)}`;
+            const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
+
+            html = `
+                <img class="detail-img" src="${data.img}">
+                <div class="detail-body">
+                    <div class="detail-title">${data.title}</div>
+                    <div class="gps-buttons">
+                        <a href="${appleMapsLink}" target="_blank" class="gps-btn apple-maps"><i class="fa-brands fa-apple"></i> Apple Maps</a>
+                        <a href="${googleMapsLink}" target="_blank" class="gps-btn google-maps"><i class="fa-brands fa-google"></i> Google Maps</a>
+                    </div>
+                    <div class="field-group">
+                        <div class="field-label"><i class="fa-regular fa-calendar"></i> Dia e Hora</div>
+                        <div class="field-value">${data.day} às ${data.time}</div>
+                    </div>
+                    <div class="field-group">
+                        <div class="field-label"><i class="fa-solid fa-location-dot"></i> Onde</div>
+                        <div class="field-value">${data.location}</div>
+                    </div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <div class="field-label"><i class="fa-solid fa-circle-info"></i> O Plano</div>
+                        <div class="field-value">${data.details}</div>
+                    </div>
+                </div>`;
+        } else {
+            const data = guiaData[index];
+
+            document.getElementById('header-text-container').style.display = 'none';
+            document.getElementById('page-title').style.display = 'block';
+            document.getElementById('page-title').innerText = "O Guia";
+            
+            const appleMapsLink = `http://maps.apple.com/?q=${encodeURIComponent(data.title + ' Évora')}`;
+            const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.title + ' Évora')}`;
+
+            html = `
+                <img class="detail-img" src="${data.img}">
+                <div class="detail-body">
+                    <div class="detail-title">${data.title}</div>
+                    <div class="gps-buttons" style="margin-bottom:20px;">
+                        <a href="${appleMapsLink}" target="_blank" class="gps-btn apple-maps"><i class="fa-brands fa-apple"></i> Maps</a>
+                        <a href="${googleMapsLink}" target="_blank" class="gps-btn google-maps"><i class="fa-brands fa-google"></i> Maps</a>
+                    </div>
+                    <div class="guide-section">
+                        <div class="guide-label"><i class="fa-solid fa-scroll"></i> A História</div>
+                        <div class="guide-text">${data.historia}</div>
+                    </div>
+                    <div class="guide-section">
+                        <div class="guide-label"><i class="fa-solid fa-eye"></i> Observar com Atenção</div>
+                        <div class="guide-text">${data.observar}</div>
+                    </div>
+                    <div class="guide-section" style="margin-bottom:0;">
+                        <div class="guide-label"><i class="fa-solid fa-book-journal-whills"></i> Lendas e Curiosidades</div>
+                        <div class="guide-text">${data.segredo}</div>
+                    </div>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-details').classList.add('active');
+        document.getElementById('btn-back').style.display = 'block';
+    }
+
+    function closeDetails() {
+        switchTab(currentTab);
+    }
+
+    const startDate = new Date(2023, 4, 27, 15, 0, 0); 
+
+    function updateLiveCounter() {
+        const now = new Date();
+
+        let years = now.getFullYear() - startDate.getFullYear();
+        let months = now.getMonth() - startDate.getMonth();
+        let days = now.getDate() - startDate.getDate();
+        let hours = now.getHours() - startDate.getHours();
+        let minutes = now.getMinutes() - startDate.getMinutes();
+        let seconds = now.getSeconds() - startDate.getSeconds();
+
+        if (seconds < 0) { seconds += 60; minutes--; }
+        if (minutes < 0) { minutes += 60; hours--; }
+        if (hours < 0) { hours += 24; days--; }
+
+        if (days < 0) {
+            const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+            days += previousMonth.getDate();
+            months--;
+        }
+
+        if (months < 0) {
+            months += 12;
+            years--;
+        }
+
+        document.getElementById('live-years').innerText = years;
+        document.getElementById('live-months').innerText = months;
+        document.getElementById('live-days').innerText = days;
+        document.getElementById('live-hours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('live-minutes').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('live-seconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    function setDynamicHeader() {
+        const hour = new Date().getHours();
+        const greeting = hour >= 6 && hour < 12 ? "Bom dia" : hour >= 12 && hour < 20 ? "Boa tarde" : "Boa noite";
+        document.getElementById('greeting-title').innerText = `${greeting}, Juliana! 🤍`;
+    }
+
+    function sendSOS() {
+        const hour = new Date().getHours();
+
+        let msgs = [
+            "SOS Namorada: Exijo atenção exclusiva nos próximos 10 minutos! 🥰",
+            "Serviço VIP: Preciso de mimos imediatamente! 🍷",
+            "SOS: Um abraço demorado, por favor! 🤍",
+            "Estou com fome de ti... e de comida também! 🍕",
+            "Atenção: A taxa de mimo está baixa. Por favor, recarregar. ❤️"
+        ];
+
+        if (hour >= 21 || hour < 5) {
+            msgs = [
+                "Serviço VIP Noturno: preciso de mimos e descanso contigo. 🌙",
+                "Missão especial: escolher um filme e ficar no quentinho. 🤍",
+                "Estou sem sono... bora planear a próxima aventura? ✨",
+                "Pedido oficial: momento calmo, conversa boa e muitos mimos. 🥰"
+            ];
+        }
+
+        const randomMsg = msgs[Math.floor(Math.random() * msgs.length)];
+        window.open(`https://wa.me/351935504166?text=${encodeURIComponent(randomMsg)}`, '_blank');
+    }
+
+    function triggerAntiStress() {
+        const msg = "🚨 ALERTA VERMELHO DE STRESS/FOME/CALOR! 🚨\n\nGonçalo, de acordo com as regras da app, tens 60 segundos para me trazer comida, uma bebida fresca ou dar-me um abraço apertado. O relógio está a contar. Fim da discussão.";
+        window.open(`https://wa.me/351935504166?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function toggleStamp(id) {
+        const isStamped = localStorage.getItem(id) === 'true';
+        if(!isStamped) {
+            localStorage.setItem(id, 'true');
+            document.getElementById('box_'+id).classList.add('stamped');
+            confetti({ particleCount: 50, origin: {y: 0.8} });
+        } else {
+            localStorage.setItem(id, 'false');
+            document.getElementById('box_'+id).classList.remove('stamped');
+        }
+    }
+
+    const checklistItems = [
+        "Óculos de sol & Protetor Solar",
+        "Roupa fresca de dia (>30ºC)",
+        "Casaco para a noite (~16ºC)",
+        "Ténis para andar e pedalar",
+        "Fato de banho",
+        "Toca de natação (Obrigatório Spa!)",
+        "Carregadores de Telemóvel",
+        "Cartão Cidadão & Carta de Condução",
+        "Boa disposição e muito Amor!"
+    ];
+
+    function renderChecklist() {
+        const container = document.getElementById('checklist-container');
+        let html = "";
+        checklistItems.forEach((item, i) => {
+            const checked = localStorage.getItem('chk_' + i) === 'true' ? 'checked' : '';
+            html += `
+                <label style="display:flex; align-items:center; gap:10px; background:var(--box-bg); padding:15px; border-radius:12px; border:1px solid var(--border);">
+                    <input type="checkbox" onchange="localStorage.setItem('chk_${i}', this.checked)" ${checked} style="width:20px; height:20px; accent-color:var(--accent);">
+                    <span style="font-size:15px; font-weight:500;">${item}</span>
+                </label>`;
+        });
+        container.innerHTML = html;
+    }
+
+    const quizDb = [
+        { q: "Onde foi o nosso primeiro beijo?", opts: ["Numa festa", "No carro", "Na praia", "Em casa"], ans: 1 },
+        { q: "Qual é a viagem de sonho da Juliana?", opts: ["Itália", "Grécia", "Tailândia", "Maldivas"], ans: 0 },
+        { q: "O que o Gonçalo diz mais vezes?", opts: ["Tenho fome", "Amo-te", "Estou cansado", "Bora sair"], ans: 1 },
+        { q: "Qual foi o nosso melhor date?", opts: ["Jantar romântico", "Passeio na praia", "Viagem surpresa", "Ficar no sofá"], ans: 2 },
+        { q: "Desafio da Viagem!", opts: ["Dá-me um abraço agora!", "Põe a nossa música a dar!", "Diz 3 coisas que amas em mim", "Todas as anteriores"], ans: 3 }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    
+    function startQuiz() {
+        currentQ = 0;
+        score = 0;
+        renderQuiz();
+        openModal('modal-quiz');
+    }
+
+    function renderQuiz() {
+        if (currentQ >= quizDb.length) {
+            document.getElementById('quiz-progress').innerText = "RESULTADO";
+            document.getElementById('quiz-q').innerText = `Acertaste ${score} em ${quizDb.length}! 🎉`;
+            document.getElementById('quiz-opts').innerHTML = "<p style='margin-bottom:20px;'>Vocês são o casal perfeito!</p>";
+            document.getElementById('quiz-next').style.display = "none";
+            confetti({ particleCount: 150 });
+            return;
+        }
+
+        document.getElementById('quiz-next').style.display = "none";
+        document.getElementById('quiz-progress').innerText = `Pergunta ${currentQ + 1} de ${quizDb.length}`;
+
+        const qData = quizDb[currentQ];
+        document.getElementById('quiz-q').innerText = qData.q;
+        
+        let optsHtml = "";
+        qData.opts.forEach((option, i) => {
+            optsHtml += `<button class="quiz-opt" onclick="guessQuiz(${i}, ${qData.ans}, this)">${option}</button>`;
+        });
+        document.getElementById('quiz-opts').innerHTML = optsHtml;
+    }
+    
+    function guessQuiz(selectedIdx, correctIdx, btn) {
+        const buttons = document.querySelectorAll('.quiz-opt');
+        buttons.forEach(b => b.style.pointerEvents = 'none'); 
+
+        if (selectedIdx === correctIdx) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            buttons[correctIdx].classList.add('correct'); 
+        }
+
+        document.getElementById('quiz-next').style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        renderQuiz();
+    }
+
+    const roletaOpcoes = [
+        "O Gonçalo paga o próximo Café/Doce ☕",
+        "A Juliana escolhe a próxima música 🎵",
+        "Beijo Apaixonado no próximo Semáforo 💋",
+        "O Gonçalo faz uma massagem de 5 min 💆‍♀️",
+        "Tirar uma Selfie engraçada AGORA 📸",
+        "A Juliana paga o próximo Café/Doce ☕",
+        "O Gonçalo leva as malas 🧳",
+        "Dizer 3 coisas que amam um no outro ❤️"
+    ];
+
+    function girarRoleta() {
+        const resultDiv = document.getElementById('roleta-resultado');
+        resultDiv.innerText = "A girar...";
+        resultDiv.style.color = "#ccc";
+        
+        let spins = 0;
+        const interval = setInterval(() => {
+            resultDiv.innerText = roletaOpcoes[Math.floor(Math.random() * roletaOpcoes.length)];
+            spins++;
+            if(spins > 15) {
+                clearInterval(interval);
+                const finalResult = roletaOpcoes[Math.floor(Math.random() * roletaOpcoes.length)];
+                resultDiv.innerText = finalResult;
+                resultDiv.style.color = "var(--accent)";
+                confetti({ particleCount: 50, spread: 60 });
+            }
+        }, 100);
+    }
+
+    function verificarCapsula() {
+        const textoGuardado = localStorage.getItem('capsulaTexto');
+        if(textoGuardado) {
+            document.getElementById('capsula-escrever').style.display = 'none';
+            const dataAbertura = new Date('2026-05-31T17:00:00'); 
+            
+            if(new Date() >= dataAbertura || CHEAT_MODE) {
+                document.getElementById('capsula-aberta').style.display = 'block';
+                document.getElementById('capsula-trancada').style.display = 'none';
+                document.getElementById('capsula-leitura').innerText = textoGuardado;
+            } else {
+                document.getElementById('capsula-trancada').style.display = 'block';
+            }
+        }
+    }
+
+    function trancarCapsula() {
+        const texto = document.getElementById('capsula-texto').value;
+        if(texto.trim() === "") return;
+        localStorage.setItem('capsulaTexto', texto);
+        verificarCapsula();
+        confetti({ particleCount: 100 });
+    }
+
+    const passaporteItems = [
+        { id: 'p_migas', icon: 'fa-bowl-food', name: 'Migas' },
+        { id: 'p_porco', icon: 'fa-piggy-bank', name: 'Porco Preto' },
+        { id: 'p_queijo', icon: 'fa-cheese', name: 'Queijo Regional' },
+        { id: 'p_vinho', icon: 'fa-wine-glass', name: 'Vinho Alentejano' },
+        { id: 'p_doce', icon: 'fa-ice-cream', name: 'Doce Conventual' },
+        { id: 'p_piscina', icon: 'fa-water-ladder', name: 'Mergulho' }
+    ];
+
+    function renderPassaporte() {
+        const grid = document.getElementById('passport-grid');
+        let html = "";
+        passaporteItems.forEach(item => {
+            const isStamped = localStorage.getItem(item.id) === 'true';
+            const cls = isStamped ? 'stamp-box stamped' : 'stamp-box';
+            html += `<div class="${cls}" id="box_${item.id}" onclick="toggleStamp('${item.id}')">
+                        <i class="fa-solid ${item.icon}"></i>
+                        <span>${item.name}</span>
+                     </div>`;
+        });
+        grid.innerHTML = html;
+    }
+
+    let saldoBeijos = parseInt(localStorage.getItem('saldoBeijos'));
+    if (isNaN(saldoBeijos)) saldoBeijos = 50;
+    
+    function carregarCarteira() {
+        document.getElementById('saldo-beijos').innerText = saldoBeijos;
+    }
+
+    function pagarBeijos(item, custo) {
+        if(saldoBeijos >= custo) {
+            saldoBeijos -= custo;
+            localStorage.setItem('saldoBeijos', saldoBeijos);
+            carregarCarteira();
+            alert(`Pagamento aprovado! O Gonçalo tem de receber ${custo} beijos na vida real agora para entregar: ${item}.`);
+        } else {
+            alert("Saldo insuficiente! Tens de ganhar mais beijos (ou pedir um empréstimo ao Gonçalo).");
+        }
+    }
+
+    const desafiosJuliana = [
+        "Tira uma foto do Gonçalo distraído.",
+        "Dá um beijo na bochecha do Gonçalo no próximo sinal vermelho.",
+        "Muda a música do carro para uma que o Gonçalo odeie (só por 1 minuto).",
+        "Elogia o estilo do Gonçalo como se fosses uma fã."
+    ];
+    const desafiosGoncalo = [
+        "Tira uma foto artística das vossas mãos dadas sem ela ver.",
+        "Faz um elogio super piroso à Juliana à frente de alguém.",
+        "Finge que te esqueceste do caminho e vê a reação dela.",
+        "Tira uma foto da Juliana a sorrir para um monumento."
+    ];
+
+    function gerarDesafio(pessoa) {
+        const box = document.getElementById('desafio-box');
+        box.style.display = 'block';
+        if(pessoa === 'Juliana') {
+            box.innerText = desafiosJuliana[Math.floor(Math.random() * desafiosJuliana.length)];
+        } else {
+            box.innerText = desafiosGoncalo[Math.floor(Math.random() * desafiosGoncalo.length)];
+        }
+    }
+
+    const preferiasDb = [
+        "Preferias ter a voz do Mickey Mouse para sempre ou espirrar sempre que te dou um beijo?",
+        "Preferias comer só migas para o resto da vida ou beber apenas água morna?",
+        "Preferias que ficassemos sem bateria no meio do nada ou que furássemos um pneu?",
+        "Preferias nunca mais poder beber vinho ou nunca mais poder comer doces?",
+        "Preferias que eu andasse sempre de bigode farfalhudo ou que rapasse as sobrancelhas?"
+    ];
+
+    function gerarPreferias() {
+        const box = document.getElementById('preferias-texto');
+        box.innerText = preferiasDb[Math.floor(Math.random() * preferiasDb.length)];
+    }
+
+    let currentCatRatings = {1:0, 2:0, 3:0};
+    
+    function rateStar(event, cat) {
+        if(event.target.tagName === 'I') {
+            const val = parseInt(event.target.getAttribute('data-val'));
+            currentCatRatings[cat] = val;
+            const stars = event.currentTarget.querySelectorAll('i');
+            stars.forEach((s, idx) => {
+                if(idx < val) s.classList.add('active');
+                else s.classList.remove('active');
+            });
+        }
+    }
+
+    function submeterAvaliacao() {
+        const total = currentCatRatings[1] + currentCatRatings[2] + currentCatRatings[3];
+        if(total === 0) return alert('Dá pelo menos umas estrelinhas!');
+        
+        const media = total / 3;
+        if(media < 4) {
+            alert('Oh não! A média foi baixa. O Gonçalo tem de comprar-te um doce imediatamente para compensar!');
+        } else {
+            alert('Obrigado pela excelente avaliação! O Gonçalo ficou muito feliz.');
+            confetti({particleCount: 100});
+        }
+        closeModal('modal-tripadvisor');
+    }
+
+    /* =========================================================
+       POLAROID FINAL - intocável
+       ========================================================= */
+
+    const cameraInputImport = document.getElementById('camera-input-import');
+    const cameraInputCamera = document.getElementById('camera-input-camera');
+
+    const canvasPol = document.getElementById('canvas-polaroid');
+    const ctx = canvasPol.getContext('2d');
+    const btnDownload = document.getElementById('download-polaroid');
+
+    const filterControls = document.getElementById('filter-controls');
+    const filterToggleBtn = document.getElementById('toggle-filter-controls');
+    const filterToggleText = document.getElementById('toggle-filter-text');
+    const filterToggleIcon = document.getElementById('toggle-filter-icon');
+
+    const strengthSlider = document.getElementById('dazz-strength');
+    const tempSlider = document.getElementById('dazz-temp');
+    const contrastSlider = document.getElementById('dazz-contrast');
+
+    const strengthVal = document.getElementById('dazz-strength-val');
+    const tempVal = document.getElementById('dazz-temp-val');
+    const contrastVal = document.getElementById('dazz-contrast-val');
+
+    let currentPolaroidImg = null;
+    let currentPhotoMode = 'import'; 
+
+    function syncPolaroidLabels() {
+        if (strengthVal && strengthSlider) strengthVal.textContent = strengthSlider.value;
+        if (tempVal && tempSlider) tempVal.textContent = tempSlider.value;
+        if (contrastVal && contrastSlider) contrastVal.textContent = contrastSlider.value;
+    }
+
+    syncPolaroidLabels();
+
+    [strengthSlider, tempSlider, contrastSlider].forEach(slider => {
+        if (!slider) return;
+
+        slider.addEventListener('input', async () => {
+            syncPolaroidLabels();
+
+            if (currentPolaroidImg) {
+                await renderPolaroid(currentPolaroidImg);
+            }
+        });
+    });
+
+    const polaroidLocInput = document.getElementById('polaroid-loc');
+
+    if (polaroidLocInput) {
+        polaroidLocInput.addEventListener('input', async () => {
+            if (currentPolaroidImg) {
+                await renderPolaroid(currentPolaroidImg);
+            }
+        });
+    }
+
+    if (cameraInputImport) {
+        cameraInputImport.addEventListener('change', async function(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            currentPhotoMode = 'import';
+
+            if (filterToggleBtn) {
+                filterToggleBtn.style.display = 'none';
+            }
+
+            if (filterControls) {
+                filterControls.style.display = 'none';
+            }
+
+            currentPolaroidImg = await loadLocalImage(file);
+            await renderPolaroid(currentPolaroidImg);
+        });
+    }
+
+    if (cameraInputCamera) {
+        cameraInputCamera.addEventListener('change', async function(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            currentPhotoMode = 'camera';
+
+            if (filterToggleBtn) {
+                filterToggleBtn.style.display = 'block';
+            }
+
+            if (filterControls) {
+                filterControls.style.display = 'none';
+            }
+
+            updateFilterToggleUi(false);
+
+            currentPolaroidImg = await loadLocalImage(file);
+            await renderPolaroid(currentPolaroidImg);
+        });
+    }
+
+    function toggleFilterControls() {
+        if (!filterControls) return;
+
+        const isOpen = filterControls.style.display === 'block';
+        const shouldOpen = !isOpen;
+
+        filterControls.style.display = shouldOpen ? 'block' : 'none';
+        updateFilterToggleUi(shouldOpen);
+    }
+
+    function updateFilterToggleUi(isOpen) {
+        if (filterToggleText) {
+            filterToggleText.textContent = isOpen ? 'Esconder ajustes' : 'Ajustar filtro';
+        }
+
+        if (filterToggleIcon) {
+            filterToggleIcon.className = isOpen
+                ? 'fa-solid fa-chevron-up'
+                : 'fa-solid fa-chevron-down';
+
+            filterToggleIcon.style.marginLeft = '8px';
+        }
+    }
+
+    function getFilterSettings() {
+        return {
+            strength: strengthSlider ? parseInt(strengthSlider.value, 10) / 100 : 0.50,
+            temp: tempSlider ? parseInt(tempSlider.value, 10) / 100 : -0.06,
+            contrast: contrastSlider ? parseInt(contrastSlider.value, 10) / 100 : 1.04
+        };
+    }
+
+    async function renderPolaroid(img) {
+        canvasPol.style.display = 'block';
+
+        const W = 900;
+        const H = 1080;
+
+        const photoX = 70;
+        const photoY = 70;
+        const photoW = 760;
+        const photoH = 760;
+
+        canvasPol.width = W;
+        canvasPol.height = H;
+
+        if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+        }
+
+        drawWhitePolaroidPaper(ctx, W, H);
+
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 4;
+        
+        drawCoverImage(ctx, img, photoX, photoY, photoW, photoH);
+        ctx.restore();
+
+        if (currentPhotoMode === 'import') {
+            addImportedPhotoFinish(ctx, photoX, photoY, photoW, photoH);
+        } else {
+            applySoftRetroFilter(ctx, photoX, photoY, photoW, photoH);
+            addSoftVignette(ctx, photoX, photoY, photoW, photoH);
+            addSubtleFilmGrain(ctx, photoX, photoY, photoW, photoH);
+            addVerySoftPaperTexture(ctx, W, H);
+        }
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.16)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(photoX, photoY, photoW, photoH);
+
+        const loc = polaroidLocInput && polaroidLocInput.value
+            ? polaroidLocInput.value
+            : 'Évora';
+
+        const time = new Date().toLocaleTimeString('pt-PT', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        ctx.textAlign = 'center';
+
+        ctx.fillStyle = '#111111';
+        ctx.font = '900 42px "Roboto", "Helvetica Neue", Arial, sans-serif';
+        ctx.fillText('3 Anos - Viagem a Évora', W / 2, 910);
+
+        ctx.fillStyle = '#666666';
+        ctx.font = '700 27px "Roboto", "Helvetica Neue", Arial, sans-serif';
+        ctx.fillText(`${loc} • ${time}`, W / 2, 960);
+
+        btnDownload.style.display = 'block';
+        btnDownload.href = canvasPol.toDataURL('image/jpeg', 0.96);
+        btnDownload.download = currentPhotoMode === 'import'
+            ? 'Nossa_Polaroid_Importada.jpg'
+            : 'Nossa_Polaroid_App.jpg';
+    }
+
+    function loadLocalImage(file) {
+        return new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                resolve(img);
+            };
+
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    function drawWhitePolaroidPaper(ctx, w, h) {
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+
+        const edge = ctx.createLinearGradient(0, 0, 0, h);
+        edge.addColorStop(0, 'rgba(0, 0, 0, 0.035)');
+        edge.addColorStop(0.08, 'rgba(255, 255, 255, 0)');
+        edge.addColorStop(0.92, 'rgba(255, 255, 255, 0)');
+        edge.addColorStop(1, 'rgba(0, 0, 0, 0.045)');
+
+        ctx.fillStyle = edge;
+        ctx.fillRect(0, 0, w, h);
+    }
+
+    function drawCoverImage(ctx, img, x, y, w, h) {
+        const scale = Math.max(w / img.width, h / img.height);
+        const sw = w / scale;
+        const sh = h / scale;
+        const sx = (img.width - sw) / 2;
+        const sy = (img.height - sh) / 2;
+
+        ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+    }
+
+    function addImportedPhotoFinish(ctx, x, y, w, h) {
+        const imageData = ctx.getImageData(x, y, w, h);
+        const d = imageData.data;
+
+        for (let i = 0; i < d.length; i += 4) {
+            const noise = (Math.random() - 0.5) * 0.9;
+            d[i] = clamp(d[i] + noise);
+            d[i + 1] = clamp(d[i + 1] + noise);
+            d[i + 2] = clamp(d[i + 2] + noise);
+        }
+
+        ctx.putImageData(imageData, x, y);
+    }
+
+    function applySoftRetroFilter(ctx, x, y, w, h) {
+        const imageData = ctx.getImageData(x, y, w, h);
+        const d = imageData.data;
+
+        for (let i = 0; i < d.length; i += 4) {
+            let r = d[i];
+            let g = d[i + 1];
+            let b = d[i + 2];
+
+            const originalR = r;
+            const originalG = g;
+            const originalB = b;
+
+            const contrast = 1.14;
+            r = (r - 128) * contrast + 128;
+            g = (g - 128) * contrast + 128;
+            b = (b - 128) * contrast + 128;
+
+            let lum = 0.299 * r + 0.587 * g + 0.114 * b;
+            const sat = 1.10;
+
+            r = lum + (r - lum) * sat;
+            g = lum + (g - lum) * sat;
+            b = lum + (b - lum) * sat;
+
+            const redDominant = r > g * 1.12 && r > b * 1.18;
+
+            if (redDominant) {
+                r -= 7;
+                g += 2;
+                b += 3;
+            }
+
+            r += 2;
+            g += 1;
+            b -= 1;
+
+            lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (lum < 45) {
+                r *= 0.82;
+                g *= 0.82;
+                b *= 0.84;
+            }
+
+            if (lum > 225) {
+                r += 8;
+                g += 8;
+                b += 8;
+            }
+
+            const strength = 0.72;
+
+            r = originalR * (1 - strength) + r * strength;
+            g = originalG * (1 - strength) + g * strength;
+            b = originalB * (1 - strength) + b * strength;
+
+            d[i] = clamp(r);
+            d[i + 1] = clamp(g);
+            d[i + 2] = clamp(b);
+        }
+
+        ctx.putImageData(imageData, x, y);
+    }
+
+    function addSoftVignette(ctx, x, y, w, h) {
+        ctx.save();
+
+        const gradient = ctx.createRadialGradient(
+            x + w / 2,
+            y + h / 2,
+            w * 0.35,
+            x + w / 2,
+            y + h / 2,
+            w * 0.78
+        );
+
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(0.75, 'rgba(0, 0, 0, 0.03)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.16)');
+
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+
+        ctx.restore();
+    }
+
+    function addSubtleFilmGrain(ctx, x, y, w, h) {
+        const imageData = ctx.getImageData(x, y, w, h);
+        const d = imageData.data;
+
+        for (let i = 0; i < d.length; i += 4) {
+            const noise = (Math.random() - 0.5) * 7;
+
+            d[i] = clamp(d[i] + noise);
+            d[i + 1] = clamp(d[i + 1] + noise);
+            d[i + 2] = clamp(d[i + 2] + noise);
+        }
+
+        ctx.putImageData(imageData, x, y);
+    }
+
+    function addVerySoftPaperTexture(ctx, w, h) {
+        ctx.save();
+
+        ctx.globalAlpha = 0.018;
+
+        for (let i = 0; i < 2500; i++) {
+            const x = Math.random() * w;
+            const y = Math.random() * h;
+            const shade = Math.random() > 0.5 ? '#000000' : '#ffffff';
+
+            ctx.fillStyle = shade;
+            ctx.fillRect(x, y, 1, 1);
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    function clamp(v) {
+        return Math.max(0, Math.min(255, Math.round(v)));
+    }
+
+    let eggClicks = 0;
+    let eggTimer;
+
+    document.getElementById('easter-egg-img').addEventListener('click', () => {
+        eggClicks++;
+        clearTimeout(eggTimer);
+
+        eggTimer = setTimeout(() => eggClicks = 0, 1000);
+
+        if (eggClicks === 3) {
+            openModal('modal-video');
+            document.getElementById('easter-video').play();
+            eggClicks = 0;
+        }
+    });
+
+    window.openModal = id => {
+        document.getElementById(id).style.display = 'flex';
+    };
+
+    window.closeModal = id => {
+        document.getElementById(id).style.display = 'none';
+
+        if (id === 'modal-video') {
+            document.getElementById('easter-video').pause();
+        }
+    };
+</script>
+
+</body>
+</html>
