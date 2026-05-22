@@ -760,7 +760,7 @@
         <div class="nos-wrapper">
             <img class="nos-img" src="casal.jpg" onerror="this.src='https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800'" id="easter-egg-img">
 
-            <div style="font-size: 26px; font-weight: 700; margin-bottom: 4px;">Amor à 1a Vista</div>
+            <div style="font-size: 26px; font-weight: 700; margin-bottom: 4px;">A Nossa História</div>
             
             <div class="counter-box">
                 <div class="counter-unit"><span>Anos juntos:</span><span id="live-years">0</span></div>
@@ -787,11 +787,13 @@
             </div>
 
             <div class="nos-letter">
-                Juliana,<br><br>
-                Preparei este pequeno guia para que o nosso fim de semana seja perfeito e sem preocupações, porque tu mereces o mundo. <br><br>
-                Foram 3 anos incríveis, cheios de aventuras e amor. Que esta viagem a Évora seja apenas mais um capítulo inesquecível.<br><br>
-                Amo-te muito! 🤍<br>
-                <strong>— Gonçalo</strong>
+                <strong>Juliju,</strong><br><br>
+                    Diz-se que o amar não é algo momentâneo e explosivo, mas sim nos momentos e vivências que criamos juntos ao longo dos anos. <br><br>
+                    Por isso preparei esta "pequena" surpresa para que o nosso fim de semana em Évora seja inesquecível. Pensa nesta app como o teu assistente pessoal (e namorado a tempo inteiro) para os próximos dias eheh.<br><br>
+                    Foram já 3 anos (só 3 anos?) incríveis e desafiantes, a construir a nossa história. Quero que te lembres deste presente como a minha forma de mostrar que o Gu romântico e totalmente apaixonado por ti nunca se irá embora e que este seja apenas mais um capítulo inesquecível da aventura que é amar-te.<br><br>
+                    Por isso durante este fim de semana esquece vais esquecer o Centro, aproveitar cada segundo e deixar-te guiar por mim (pela minha app na verdade).<br><br>
+                    Amo-te de verdade Ursinha! 🤍<br>
+                <strong>— O teu, e só teu, Gugu</strong>
             </div>
         </div>
     </div>
@@ -808,8 +810,8 @@
                 Bem-vinda à nossa viagem de 3 Anos! Ao clicar em aceitar, a <strong>Juliana</strong> compromete-se legalmente a:<br><br>
                 1. Não falar nem pensar em trabalho.<br>
                 2. Aceitar que as calorias em Évora não contam.<br>
-                3. Dar a mão ao seu guia (Gonçalo) sempre que possível.<br>
-                4. Estar pronta para muitas surpresas e beijos.
+                3. Dar a mão ao seu guia (Gugu) sempre que possível.<br>
+                4. Estar pronta para muitas surpresas e beijinhos.
             </p>
             <button onclick="assinarContrato()" style="width:100%; background:var(--accent); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:16px; cursor:pointer;">
                 Aceito e Prometo! ❤️
@@ -859,7 +861,7 @@
         <div class="modal-content" style="text-align:center;">
             <button class="close-modal" onclick="closeModal('modal-capsula')"><i class="fa-solid fa-xmark"></i></button>
             <h3 style="margin-bottom:10px;"><i class="fa-solid fa-hourglass-end"></i> Cápsula do Tempo</h3>
-            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Escrevam uma mensagem e trancam. Só abre no Domingo às 17h00 quando chegarem!</p>
+            <p style="font-size:13px; color:var(--subtext); margin-bottom:20px;">Escrevam uma mensagem e tranquem. Depois esta só se abre no Domingo às 17h00 quando chegarem!</p>
             
             <div id="capsula-escrever" style="display:block;">
                 <textarea id="capsula-texto" rows="5" style="width:100%; padding:15px; border-radius:10px; border:1px solid #ccc; font-size:14px; font-family:inherit; margin-bottom:15px;" placeholder="Escrevam aqui as vossas expetativas..."></textarea>
@@ -902,8 +904,8 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button onclick="pagarBeijos('Pagar um Café', 2)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Pagar um Café</span> <span>2 Beijos</span></button>
-                <button onclick="pagarBeijos('Massagem aos pés', 15)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Massagem aos pés</span> <span>15 Beijos</span></button>
+                <button onclick="pagarBeijos('Pagar um Café', 2)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Pagar um Café/Doce</span> <span>2 Beijos</span></button>
+                <button onclick="pagarBeijos('Massagem aos pés', 15)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Massagem aos pés!</span> <span>15 Beijos</span></button>
                 <button onclick="pagarBeijos('Pagar o Jantar', 30)" style="background:var(--box-bg); border:1px solid var(--border); padding:15px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;"><span>Pagar o Jantar</span> <span>30 Beijos</span></button>
             </div>
         </div>
@@ -1602,21 +1604,55 @@
 
     function sendSOS() {
         const hour = new Date().getHours();
+        let msgs = [];
 
-        let msgs = [
-            "SOS Namorada: Exijo atenção exclusiva nos próximos 10 minutos! 🥰",
-            "Serviço VIP: Preciso de mimos imediatamente! 🍷",
-            "SOS: Um abraço demorado, por favor! 🤍",
-            "Estou com fome de ti... e de comida também! 🍕",
-            "Atenção: A taxa de mimo está baixa. Por favor, recarregar. ❤️"
-        ];
-
-        if (hour >= 21 || hour < 5) {
+        if (hour >= 6 && hour < 20) {
+            // 20 MENSAGENS PARA O DIA (Logística, passeio, atenção, comida)
+            msgs = [
+                "SOS Namorada: Exijo atenção exclusiva nos próximos 10 minutos! 🥰",
+                "Emergência: Estou com fome de ti... e de comida também. Alimenta-me! 🍕",
+                "Serviço de namorado ativado: Vem dar-me a mão, por favor. 🤝",
+                "Alerta: Nível de açúcar no sangue a descer. Preciso de um doce! 🍦",
+                "SOS Fotografia: Preciso do meu fotógrafo oficial neste local para uma foto! 📸",
+                "As minhas pernas estão cansadas. Podes carregar a minha mala? 🥺🎒",
+                "Preciso de uma pausa técnica para hidratar e receber mimos. 🚰",
+                "SOS: Um beijo de cinema no meio da rua, sff! 😘",
+                "Desafio: Tens 5 minutos para me fazeres rir à gargalhada. Vai! 😂",
+                "O GPS está a stressar-me. Assume o comando e guia-me! 🗺️",
+                "Atenção: A taxa de mimo está criticamente baixa. Por favor, recarregar. ❤️",
+                "Preciso de protetor solar e não chego às costas. Apresenta-te ao serviço. 🧴",
+                "Alerta Turista: Conta-me uma curiosidade inventada sobre este sítio. 🤓",
+                "SOS: Pára tudo o que estás a fazer e olha para mim. Sou linda, não sou? ✨",
+                "Desejo súbito de comprar uma lembrança inútil. Leva-me a uma loja! 🛍️",
+                "Preciso que me digas exatamente o quão fantástica estou hoje. 💅",
+                "SOS Calor: Preciso de uma sombra e de uma bebida fresca URGENTE. 🧊",
+                "Serviço de Guia: Tira uma foto nossa sem eu estar a olhar. 🥰",
+                "Emergência de cansaço: Preciso de ser carregada às cavalitas 10 metros. 🐎",
+                "Alerta de Amor: Só te enviei isto para te lembrar que és o melhor namorado do mundo. 🤍"
+            ];
+        } else {
+            // 20 MENSAGENS PARA A NOITE (Hotel, mimos, romântico, atrevido)
             msgs = [
                 "Serviço VIP Noturno: preciso de mimos e descanso contigo. 🌙",
-                "Missão especial: escolher um filme e ficar no quentinho. 🤍",
+                "Missão especial: escolher um filme e ficar no quentinho a abraçar. 🍿",
                 "Estou sem sono... bora planear a próxima aventura? ✨",
-                "Pedido oficial: momento calmo, conversa boa e muitos mimos. 🥰"
+                "Pedido oficial: momento calmo, conversa boa e muitos mimos. 🥰",
+                "Serviço de Quarto VIP: Preciso de vinho e da tua companhia. 🍷",
+                "Alerta de Cansaço: A Juliana exige uma massagem nos pés ou nas costas. 💆‍♀️",
+                "SOS Noturno: Vem aquecer-me os pés, estão gelados! 🥶",
+                "O Serviço de Massagens privadas foi solicitado na cama. Apresenta-te. 🔥",
+                "Missão especial na cama, apresenta-te imediatamente! 🤫",
+                "Desafio noturno: Conta-me a tua memória favorita destes 3 anos. 💭",
+                "SOS: Precisamos de tirar uma selfie de roupão. Agora. 📸",
+                "Alerta: Preciso de ser beijada até adormecer. 😘",
+                "Tiras-me a maquilhagem pff? Mentira, mas traz-me uma toalha sff. 😂",
+                "SOS: Esconde o telemóvel e olha só para mim. 📵",
+                "Desejo da Meia-Noite: Sussurra-me algo provocador ao ouvido. 🗣️",
+                "Atenção: O teu lado da cama está muito longe. Aproxima-te. 🫂",
+                "Estou com desejos de sobremesa da meia-noite. Tens algo para mim? 🍫",
+                "SOS: Estou carente. Podes fazer-me cafuné até eu desligar o sistema? 💤",
+                "Emergência de Frio: Preciso de calor humano (o teu, preferencialmente). 🌡️",
+                "Avaliação do dia: 5 estrelas. Vem receber a tua recompensa. ⭐"
             ];
         }
 
@@ -1645,7 +1681,7 @@
         "Óculos de sol & Protetor Solar",
         "Roupa fresca de dia (>30ºC)",
         "Casaco para a noite (~16ºC)",
-        "Ténis para andar e pedalar",
+        "Sapatilhas confortáveis",
         "Fato de banho",
         "Toca de natação (Obrigatório Spa!)",
         "Carregadores de Telemóvel",
@@ -1668,11 +1704,33 @@
     }
 
     const quizDb = [
-        { q: "Onde foi o nosso primeiro beijo?", opts: ["Numa festa", "No carro", "Na praia", "Em casa"], ans: 1 },
+        { q: "Onde foi o nosso primeiro beijo?", opts: ["Numa festa", "No carro", "Na praia", "Na rua"], ans: 3 },
         { q: "Qual é a viagem de sonho da Juliana?", opts: ["Itália", "Grécia", "Tailândia", "Maldivas"], ans: 0 },
-        { q: "O que o Gonçalo diz mais vezes?", opts: ["Tenho fome", "Amo-te", "Estou cansado", "Bora sair"], ans: 1 },
+        { q: "O que o Gonçalo diz mais vezes?", opts: ["Tenho fome", "Amo-te", "Estou cansado", "Bora sair"], ans: 3 },
         { q: "Qual foi o nosso melhor date?", opts: ["Jantar romântico", "Passeio na praia", "Viagem surpresa", "Ficar no sofá"], ans: 2 },
-        { q: "Desafio da Viagem!", opts: ["Dá-me um abraço agora!", "Põe a nossa música a dar!", "Diz 3 coisas que amas em mim", "Todas as anteriores"], ans: 3 }
+        { q: "Quem adormece sempre a ver filmes?", opts: ["O Gonçalo", "A Juliana", "Os dois ao mesmo tempo", "Nenhum"], ans: 1 },
+        { q: "Se a Juliana fosse um prato de comida, qual seria?", opts: ["Sushi", "Francesinha", "Pizza", "Lasanha"], ans: 1 },
+        { q: "Quem demora mais tempo a arranjar-se?", opts: ["O Gonçalo", "A Juliana", "Demoram o mesmo", "Depende do dia"], ans: 1 },
+        { q: "Qual é o maior vício do Gonçalo?", opts: ["PlayStation", "Doces", "Dormir", "Ver TV"], ans: 3 },
+        { q: "Quem é mais provável perder-se com o GPS ligado?", opts: ["A Juliana", "O Gonçalo", "O próprio GPS", "Nenhum"], ans: 0 },
+        { q: "Qual foi a nossa primeira viagem juntos?", opts: ["Algarve", "Porto", "Nazaré", "Sintra"], ans: 3 },
+        { q: "Quem é o mais resmungão quando tem fome?", opts: ["O Gonçalo", "A Juliana", "Empate técnico", "Quem não tem a comida na mão"], ans: 1 },
+        { q: "Se ganhássemos o Euromilhões amanhã, o que fazíamos primeiro?", opts: ["Comprar casa", "Viagem ao mundo", "Desmaiar", "Comprar um carro"], ans: 0 },
+        { q: "Quem tem melhor gosto musical?", opts: ["A Juliana", "O Gonçalo", "O Apple Music", "Ambos"], ans: 3 },
+        { q: "Qual é o filme/série que a Juliana não se cansa de ver?", opts: ["Friends", "Harry Potter", "Anatomia de Grey", "The Office"], ans: 3 },
+        { q: "Quem é o mais dramático quando está doente?", opts: ["Gonçalo", "Juliana", "Os dois", "Nenhum"], ans: 0 },
+        { q: "Onde comemos no nosso primeiro aniversário?", opts: ["Num restaurante chique", "No MacDonald's", "Em casa", "Em vídeo-chamada"], ans: 3 },
+        { q: "Qual é a tarefa doméstica que o Gonçalo mais odeia?", opts: ["Lavar loiça", "Aspirar", "Passar a ferro", "Estender roupa"], ans: 2 },
+        { q: "Quem diz 'Desculpa' primeiro depois de uma amuadela?", opts: ["O Gonçalo", "A Juliana", "O que tiver fome primeiro", "Ficam sem falar 1 ano"], ans: 0 },
+        { q: "Se fossemos uma dupla famosa, seríamos...", opts: ["Batman e Robin", "Bonnie e Clyde", "Shrek e Fiona", "Tom e Jerry"], ans: 2 },
+        { q: "Quem rouba mais espaço na cama?", opts: ["A Juliana (e os cobertores todos)", "O Gonçalo", "O gato/cão", "Dormimos agarradinhos"], ans: 1 },
+        { q: "O que irrita mais a Juliana a conduzir?", opts: ["Trânsito", "Pessoas que não dão pisca", "O Gonçalo a dar palpites", "Tudo"], ans: 3 },
+        { q: "Qual é o 'guilty pleasure' da Juliana?", opts: ["Comer Nutella à colherada", "Ver Reality Shows rascas", "Cantar no banho", "Água com Sabores"], ans: 1 },
+        { q: "Quem é mais provável esquecer-se de algo importante em casa?", opts: ["O Gonçalo", "A Juliana", "A carteira do Gonçalo", "As chaves"], ans: 1 },
+        { q: "O que diz o Gonçalo para evitar uma discussão?", opts: ["'Tens razão amor'", "'Tá bem, ok'", "'Vamos comer?'", "Fica calado"], ans: 0 },
+        { q: "Qual é a nossa melhor qualidade enquanto casal?", opts: ["Comunicação", "Apoio mútuo", "Divertimo-nos muito", "Sermos lindos"], ans: 1 },
+        { q: "Quem é o fotógrafo oficial da relação?", opts: ["A Juliana (diretora de arte)", "O Gonçalo (o tripé humano)", "Pessoas na rua", "O temporizador"], ans: 0 },
+        { q: "Como vão ser os próximos 3 anos?", opts: ["Incríveis", "Cheios de viagens", "Com muito amor", "Todas e muito mais!"], ans: 3 }
     ];
 
     let currentQ = 0;
@@ -1735,8 +1793,30 @@
         "O Gonçalo faz uma massagem de 5 min 💆‍♀️",
         "Tirar uma Selfie engraçada AGORA 📸",
         "A Juliana paga o próximo Café/Doce ☕",
-        "O Gonçalo leva as malas 🧳",
-        "Dizer 3 coisas que amam um no outro ❤️"
+        "O Gonçalo leva as malas/sacos 🧳",
+        "Dizer 3 coisas que amam um no outro ❤️",
+        "O Gonçalo escolhe onde vamos jantar 🍽️",
+        "A Juliana escolhe onde vamos jantar 🍽️",
+        "Fazer uma declaração pirosa em voz alta 📢",
+        "O Gonçalo tem de imitar o sotaque alentejano 🗣️",
+        "Parar tudo e dar um abraço de 30 segundos 🫂",
+        "Quem perdeu no Pedra, Papel, Tesoura paga a próxima ronda ✂️",
+        "A Juliana ganha o direito a 1 veto de decisão 🛑",
+        "Cantar o refrão da vossa música favorita a plenos pulmões 🎤",
+        "O Gonçalo tem de carregar a Juliana às cavalitas (10 passos) 🐎",
+        "Tirar uma foto a imitar uma estátua do Templo Romano 🏛️",
+        "A Juliana escolhe o filme/série para logo à noite 🎬",
+        "O Gonçalo serve o pequeno-almoço/café amanhã 🥐",
+        "Olharem-se nos olhos sem rir (quem rir primeiro perde) 👀",
+        "O Gonçalo tira 5 fotos à Juliana tipo 'paparazzi' 📸",
+        "A Juliana tem de falar a rimar nos próximos 5 minutos 📝",
+        "Andar de mãos dadas até ao próximo destino obrigatoriamente 🤝",
+        "Pedir a um estranho para vos tirar uma foto romântica 👫",
+        "O Gonçalo tem de alimentar a Juliana com um pedaço de comida 🍫",
+        "A Juliana faz uma massagem no pescoço do Gonçalo (2 min) 💆‍♂️",
+        "Contar a vossa melhor piada seca. Quem não rir, ganha. 🤡",
+        "O Gonçalo não pode dizer a palavra 'Não' na próxima meia hora 🚫",
+        "Beijinho no pescoço sem aviso prévio 😘"
     ];
 
     function girarRoleta() {
@@ -1826,14 +1906,46 @@
     const desafiosJuliana = [
         "Tira uma foto do Gonçalo distraído.",
         "Dá um beijo na bochecha do Gonçalo no próximo sinal vermelho.",
-        "Muda a música do carro para uma que o Gonçalo odeie (só por 1 minuto).",
-        "Elogia o estilo do Gonçalo como se fosses uma fã."
+        "Muda a música do carro para uma que ele odeie.",
+        "Elogia o estilo dele como se fosses uma fã louca.",
+        "Aperta-lhe o rabo 'discretamente' em público.",
+        "Faz-lhe uma massagem na nuca sem ele pedir.",
+        "Diz-lhe um segredo ao ouvido num local com muita gente.",
+        "Rouba-lhe uma peça de comida do prato dele sem pedir autorização.",
+        "Pede-lhe para te pegar ao colo para uma foto.",
+        "Escreve 'Amo-te' num guardanapo e esconde no bolso dele.",
+        "Faz-lhe beicinho até ele te dar um beijo na testa.",
+        "Fica a olhar fixamente para os lábios dele enquanto ele fala.",
+        "Agarra no braço dele e diz 'Ainda bem que estás aqui comigo papá'.",
+        "Desarruma-lhe o cabelo quando ele acabar de o ajeitar.",
+        "Faz um vídeo curto dele a conduzir/andar e guarda para ti.",
+        "Canta uma música romântica para ele, mas com voz de ópera.",
+        "Pede-lhe para te ensinar algo que ele saiba (mesmo que tu já saibas).",
+        "Morde-lhe levemente a orelha quando estiverem a sós.",
+        "Tira uma selfie a dar-lhe um beijo na bochecha de surpresa."
     ];
+
     const desafiosGoncalo = [
         "Tira uma foto artística das vossas mãos dadas sem ela ver.",
         "Faz um elogio super piroso à Juliana à frente de alguém.",
         "Finge que te esqueceste do caminho e vê a reação dela.",
-        "Tira uma foto da Juliana a sorrir para um monumento."
+        "Tira uma foto da Juliana a sorrir para um monumento.",
+        "Abre a porta do carro/restaurante para ela como um lorde.",
+        "Diz-lhe que ela está especialmente bonita hoje, do nada.",
+        "Oferece-te para carregar a carteira/casaco dela durante 15 minutos.",
+        "Compra um doce ou lembrança pequena sem ela dar por isso e oferece.",
+        "Puxa a cadeira para ela se sentar no próximo restaurante.",
+        "Dá-lhe um beijo intenso e cinematográfico a meio da rua.",
+        "Elogia uma característica física dela que raramente elogias.",
+        "Tira 3 fotos dela de ângulos diferentes e diz que é para a capa da Vogue.",
+        "Quando ela estiver a falar, interrompe com um beijo.",
+        "Coloca o teu casaco sobre os ombros dela se estiver frio.",
+        "Faz-lhe cafuné no cabelo durante a viagem de carro.",
+        "Desafia-a para uma corrida até à próxima esquina.",
+        "Convida-a para dançar sem música num sítio calmo.",
+        "Olha para ela, sorri e diz 'Não acredito na sorte que tenho'.",
+        "Pisca-lhe o olho do outro lado da sala/mesa de forma sedutora.",
+        "Deixa-a ganhar uma mini-discussão propositadamente."
     ];
 
     function gerarDesafio(pessoa) {
@@ -1851,7 +1963,32 @@
         "Preferias comer só migas para o resto da vida ou beber apenas água morna?",
         "Preferias que ficassemos sem bateria no meio do nada ou que furássemos um pneu?",
         "Preferias nunca mais poder beber vinho ou nunca mais poder comer doces?",
-        "Preferias que eu andasse sempre de bigode farfalhudo ou que rapasse as sobrancelhas?"
+        "Preferias que eu andasse sempre de bigode farfalhudo ou que rapasse as sobrancelhas?",
+        "Preferias que trocássemos de corpos por um dia ou que lêssemos os pensamentos um do outro por uma hora?",
+        "Preferias vivermos sempre num hotel de 5 estrelas ou numa cabana na montanha com vista incrível?",
+        "Preferias não lavar os dentes durante 1 semana ou não tomar banho durante 1 semana?",
+        "Preferias que a nossa vida tivesse uma banda sonora de fundo constante ou risos falsos como nas sitcoms?",
+        "Preferias esquecer todos os nossos beijos (para viver tudo de novo) ou nunca mais poderes beijar-me?",
+        "Preferias usar fato de treino num casamento ou ir de vestido/fato de gala ao supermercado?",
+        "Preferias falar sempre a gritar ou falar sempre a sussurrar?",
+        "Preferias saber a data exata da tua morte ou a causa exata da tua morte?",
+        "Preferias ganhar 1 milhão de euros agora ou ter 50% de probabilidade de ganhar 100 milhões?",
+        "Preferias nunca mais poder usar internet ou nunca mais poder andar de avião?",
+        "Preferias ter dentes de madeira ou cabelo de esparguete?",
+        "Preferias que o teu histórico de pesquisas fosse publicado na internet ou andar nu na rua 10 minutos?",
+        "Preferias estar sempre 1 hora atrasado para tudo ou chegar 1 hora adiantado a tudo?",
+        "Preferias ter o superpoder de voar (a 5 km/h) ou ser invisível (mas ter de fechar os olhos)?",
+        "Preferias passar um mês sem o telemóvel ou um mês sem mim? (Cuidado com a resposta!)",
+        "Preferias que o nosso primeiro date tivesse sido um desastre ou não ter acontecido e conhecermo-nos hoje?",
+        "Preferias que tivéssemos de partilhar a mesma escova de dentes ou a mesma toalha de banho sempre?",
+        "Preferias viver num mundo onde só existe inverno ou num mundo onde só existe verão?",
+        "Preferias ter o dobro do teu peso ou metade da tua altura?",
+        "Preferias esquecer-te do meu aniversário todos os anos ou esqueceres-te do teu próprio nome às vezes?",
+        "Preferias comer comida de cão a saber a chocolate ou chocolate a saber a comida de cão?",
+        "Preferias poder falar com os animais ou falar todas as línguas do mundo?",
+        "Preferias reviver o nosso melhor dia juntos vezes sem conta (loop) ou ter 50 novos dias medianos?",
+        "Preferias que fossemos colegas de trabalho muito chatos um para o outro ou rivais num concurso de culinária?",
+        "Preferias que a tua vida fosse um musical (ter de cantar as falas) ou um filme de ação (tudo explode)?"
     ];
 
     function gerarPreferias() {
